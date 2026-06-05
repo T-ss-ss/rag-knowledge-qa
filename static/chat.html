@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 知识库问答</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif; background: #f0f2f5; height: 100vh; display: flex; flex-direction: column; color: #333; }
+        header { background: #fff; padding: 10px 20px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #e0e0e0; flex-shrink: 0; }
+        header h1 { font-size: 18px; white-space: nowrap; }
+        header select { padding: 6px 12px; border: 1px solid #d0d0d0; border-radius: 6px; font-size: 14px; background: #fff; cursor: pointer; }
+        .mode-toggle { display: flex; border-radius: 6px; overflow: hidden; border: 1px solid #d0d0d0; }
+        .mode-toggle button { padding: 6px 14px; border: none; font-size: 13px; cursor: pointer; background: #fff; color: #666; transition: all 0.2s; }
+        .mode-toggle button.active { background: #1a73e8; color: #fff; }
+        .reasoning-block { margin-top: 8px; }
+        .reasoning-toggle { font-size: 12px; color: #e67e22; cursor: pointer; background: none; border: none; padding: 4px 0; }
+        .reasoning-toggle:hover { text-decoration: underline; }
+        .step-item { font-size: 12px; color: #666; padding: 3px 8px; margin-top: 2px; border-left: 2px solid #e67e22; }
+        .step-item .step-type { color: #e67e22; font-weight: 500; }
+        .layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 260px; background: #fff; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-header { padding: 12px; border-bottom: 1px solid #f0f0f0; }
+        .btn-new { width: 100%; padding: 10px; background: #1a73e8; color: #fff; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; transition: background 0.2s; }
+        .btn-new:hover { background: #1557b0; }
+        .conv-list { flex: 1; overflow-y: auto; padding: 8px; }
+        .conv-item { padding: 10px 12px; border-radius: 8px; cursor: pointer; margin-bottom: 4px; transition: background 0.15s; display: flex; justify-content: space-between; align-items: center; }
+        .conv-item:hover { background: #f5f5f5; }
+        .conv-item.active { background: #e8f0fe; color: #1a73e8; }
+        .conv-item .title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+        .conv-item .count { font-size: 11px; color: #999; margin-left: 8px; flex-shrink: 0; }
+        .conv-item .btn-del { visibility: hidden; background: none; border: none; color: #999; cursor: pointer; font-size: 14px; padding: 0 4px; }
+        .conv-item:hover .btn-del { visibility: visible; }
+        .conv-item .btn-del:hover { color: #e53935; }
+        .empty-conv { text-align: center; color: #999; padding: 40px 20px; font-size: 13px; }
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .messages { flex: 1; overflow-y: auto; padding: 20px; }
+        .msg { margin-bottom: 20px; display: flex; gap: 10px; }
+        .msg.user { flex-direction: row-reverse; }
+        .msg-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+        .msg.assistant .msg-avatar { background: #e8f0fe; color: #1a73e8; }
+        .msg.user .msg-avatar { background: #e8f5e9; color: #2e7d32; }
+        .msg-body { max-width: 72%; }
+        .msg-content { padding: 12px 16px; border-radius: 12px; font-size: 14px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+        .msg.assistant .msg-content { background: #fff; border: 1px solid #e8e8e8; }
+        .msg.user .msg-content { background: #1a73e8; color: #fff; }
+        .sources-block { margin-top: 8px; }
+        .sources-toggle { font-size: 12px; color: #1a73e8; cursor: pointer; background: none; border: none; padding: 4px 0; }
+        .sources-toggle:hover { text-decoration: underline; }
+        .source-card { background: #fafafa; border: 1px solid #eee; border-radius: 6px; padding: 8px 10px; margin-top: 6px; font-size: 12px; }
+        .source-card .src-header { color: #666; margin-bottom: 4px; }
+        .source-card .src-header strong { color: #333; }
+        .source-card .src-text { color: #555; line-height: 1.5; max-height: 120px; overflow-y: auto; white-space: pre-wrap; }
+        .input-area { padding: 16px 20px; background: #fff; border-top: 1px solid #e0e0e0; display: flex; gap: 10px; }
+        .input-area textarea { flex: 1; padding: 10px 14px; border: 1px solid #d0d0d0; border-radius: 8px; font-size: 14px; resize: none; font-family: inherit; line-height: 1.5; rows: 2; }
+        .input-area textarea:focus { outline: none; border-color: #1a73e8; }
+        .input-area button { padding: 10px 24px; background: #1a73e8; color: #fff; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; transition: background 0.2s; }
+        .input-area button:hover { background: #1557b0; }
+        .input-area button:disabled { background: #a0c4f0; cursor: not-allowed; }
+        .welcome { text-align: center; color: #999; padding: 80px 20px; }
+        .welcome h2 { font-size: 24px; color: #333; margin-bottom: 12px; }
+        .loading { text-align: center; color: #999; padding: 40px; }
+        .msg-content.thinking { color: #999; animation: pulse 1.5s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .streaming-cursor::after { content: '|'; animation: blink 1s step-end infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+        .btn-upload { padding: 6px 16px; background: #fff; color: #1a73e8; border: 1px solid #1a73e8; border-radius: 6px; font-size: 13px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .btn-upload:hover { background: #e8f0fe; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 100; justify-content: center; align-items: center; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: #fff; border-radius: 12px; padding: 28px; width: 420px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); }
+        .modal h3 { margin-bottom: 16px; font-size: 16px; }
+        .modal .file-zone { border: 2px dashed #d0d0d0; border-radius: 8px; padding: 24px; text-align: center; cursor: pointer; margin-bottom: 14px; transition: border-color 0.2s; }
+        .modal .file-zone:hover { border-color: #1a73e8; }
+        .modal .file-zone.selected { border-color: #4caf50; background: #f1f8e9; }
+        .modal .file-zone .icon { font-size: 32px; margin-bottom: 8px; }
+        .modal .file-zone .hint { font-size: 13px; color: #999; }
+        .modal .file-zone .file-name { font-size: 14px; color: #333; font-weight: 500; }
+        .modal .file-zone .file-size { font-size: 12px; color: #666; }
+        .modal select { width: 100%; padding: 8px 12px; border: 1px solid #d0d0d0; border-radius: 6px; font-size: 14px; margin-bottom: 14px; }
+        .modal .upload-progress { display: none; height: 6px; background: #e0e0e0; border-radius: 3px; margin-bottom: 14px; overflow: hidden; }
+        .modal .upload-progress .bar { height: 100%; background: #1a73e8; width: 0%; transition: width 0.3s; }
+        .modal .modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
+        .modal .modal-btns button { padding: 8px 20px; border-radius: 6px; font-size: 13px; cursor: pointer; }
+        .modal .btn-cancel { background: #fff; border: 1px solid #d0d0d0; color: #666; }
+        .modal .btn-confirm { background: #1a73e8; border: none; color: #fff; }
+        .modal .btn-confirm:disabled { background: #a0c4f0; cursor: not-allowed; }
+        #file-input { display: none; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>AI 知识库问答</h1>
+    <select id="kb-select"></select>
+    <div class="mode-toggle" id="mode-toggle">
+        <button data-mode="rag" class="active">RAG</button>
+        <button data-mode="agent">Agent</button>
+    </div>
+    <button class="btn-upload" id="btn-upload">📄 上传 PDF</button>
+</header>
+<input type="file" id="file-input" accept=".pdf">
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+        <h3>上传 PDF 文档</h3>
+        <div class="file-zone" id="file-zone">
+            <div class="icon">📁</div>
+            <div class="hint">点击选择 PDF 文件</div>
+        </div>
+        <select id="upload-kb-select"></select>
+        <div class="upload-progress" id="upload-progress"><div class="bar"></div></div>
+        <div class="modal-btns">
+            <button class="btn-cancel" id="btn-cancel">取消</button>
+            <button class="btn-confirm" id="btn-confirm" disabled>上传</button>
+        </div>
+    </div>
+</div>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <button class="btn-new" id="btn-new-conv">+ 新建会话</button>
+        </div>
+        <div class="conv-list" id="conv-list">
+            <div class="empty-conv">暂无会话</div>
+        </div>
+    </aside>
+    <main class="main">
+        <div class="messages" id="messages">
+            <div class="welcome"><h2>选择一个会话开始提问</h2><p>或点击左侧"新建会话"创建新对话</p></div>
+        </div>
+        <div class="input-area">
+            <textarea id="question-input" placeholder="输入你的问题，按 Enter 发送..." rows="2" disabled></textarea>
+            <button id="btn-send" disabled>发送</button>
+        </div>
+    </main>
+</div>
+<script>
+const $ = (s) => document.querySelector(s);
+const kbSelect = $('#kb-select');
+const convList = $('#conv-list');
+const messagesEl = $('#messages');
+const questionInput = $('#question-input');
+const btnSend = $('#btn-send');
+const btnNew = $('#btn-new-conv');
+
+let currentKbId = 'default';
+let currentConvId = null;
+let conversations = [];
+let messages = [];
+let sending = false;
+let chatMode = 'rag'; // 'rag' or 'agent'
+
+// Mode toggle
+document.querySelectorAll('#mode-toggle button').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('#mode-toggle button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        chatMode = btn.dataset.mode;
+    });
+});
+
+async function api(url, options = {}) {
+    const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...options });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: '请求失败' }));
+        throw new Error(err.detail || '请求失败');
+    }
+    return res.json();
+}
+
+// KB selector
+async function loadKBs() {
+    const data = await api('/api/knowledge-bases');
+    kbSelect.innerHTML = data.knowledge_bases.map(kb =>
+        `<option value="${kb.id}">${kb.name} (${kb.document_count} 文档)</option>`
+    ).join('');
+    kbSelect.value = currentKbId;
+}
+
+kbSelect.addEventListener('change', () => {
+    currentKbId = kbSelect.value;
+    currentConvId = null;
+    conversations = [];
+    renderConvList();
+    renderWelcome();
+    setInputEnabled(false);
+    loadConversations();
+});
+
+// Conversations
+async function loadConversations() {
+    const data = await api(`/api/conversations?kb_id=${encodeURIComponent(currentKbId)}`);
+    conversations = data.conversations;
+    renderConvList();
+}
+
+function renderConvList() {
+    if (conversations.length === 0) {
+        convList.innerHTML = '<div class="empty-conv">暂无会话，点击上方按钮新建</div>';
+        return;
+    }
+    convList.innerHTML = conversations.map(c => {
+        const title = c.title || '新会话';
+        return `<div class="conv-item${c.id === currentConvId ? ' active' : ''}" data-id="${c.id}">
+            <span class="title">${escapeHtml(title)}</span>
+            <span class="count">${c.message_count}</span>
+            <button class="btn-del" data-id="${c.id}" title="删除">×</button>
+        </div>`;
+    }).join('');
+
+    convList.querySelectorAll('.conv-item').forEach(el => {
+        el.addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn-del')) return;
+            selectConversation(el.dataset.id);
+        });
+    });
+    convList.querySelectorAll('.btn-del').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const cid = btn.dataset.id;
+            if (!confirm('确定要删除该会话吗？')) return;
+            await api(`/api/conversations/${cid}`, { method: 'DELETE' });
+            if (currentConvId === cid) {
+                currentConvId = null;
+                messages = [];
+                renderWelcome();
+                setInputEnabled(false);
+            }
+            conversations = conversations.filter(c => c.id !== cid);
+            renderConvList();
+        });
+    });
+}
+
+async function selectConversation(convId) {
+    currentConvId = convId;
+    const data = await api(`/api/conversations/${convId}`);
+    messages = data.messages || [];
+    renderMessages();
+    setInputEnabled(true);
+    renderConvList();
+    questionInput.focus();
+}
+
+async function createConversation() {
+    const data = await api('/api/conversations', {
+        method: 'POST',
+        body: JSON.stringify({ kb_id: currentKbId, title: '' }),
+    });
+    conversations.unshift(data);
+    renderConvList();
+    selectConversation(data.id);
+}
+
+btnNew.addEventListener('click', createConversation);
+
+// Messages
+function renderWelcome() {
+    messagesEl.innerHTML = '<div class="welcome"><h2>选择一个会话开始提问</h2><p>或点击左侧"新建会话"创建新对话</p></div>';
+}
+
+function renderMessages() {
+    if (messages.length === 0) {
+        messagesEl.innerHTML = '<div class="welcome"><p>开始你的第一个问题吧</p></div>';
+        return;
+    }
+    messagesEl.innerHTML = messages.map((m, i) => {
+        if (m.role === 'user') {
+            return `<div class="msg user"><div class="msg-avatar">U</div><div class="msg-body"><div class="msg-content">${escapeHtml(m.content)}</div></div></div>`;
+        }
+        const sources = m.sources || [];
+        const hasSources = sources.length > 0;
+        const reasoningSteps = m.reasoning_steps || [];
+        const hasReasoning = reasoningSteps.length > 0;
+        const thinkingClass = m._thinking ? ' thinking' : '';
+        return `<div class="msg assistant">
+            <div class="msg-avatar">AI</div>
+            <div class="msg-body">
+                <div class="msg-content${thinkingClass}">${escapeHtml(m.content)}</div>
+                ${hasReasoning ? renderReasoningHtml(reasoningSteps, i) : ''}
+                ${hasSources ? renderSourcesHtml(sources, i) : ''}
+            </div>
+        </div>`;
+    }).join('');
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function renderSourcesHtml(sources, msgIdx) {
+    const id = `sources-${msgIdx}`;
+    let html = `<div class="sources-block"><button class="sources-toggle" onclick="document.getElementById('${id}').style.display=document.getElementById('${id}').style.display==='none'?'block':'none'">📄 查看来源 (${sources.length})</button>`;
+    html += `<div id="${id}" style="display:none">`;
+    sources.forEach((s, i) => {
+        html += `<div class="source-card">
+            <div class="src-header"><strong>[${i + 1}] ${s.filename}</strong> 第${s.page}页 · 相关度 ${(s.relevance_score * 100).toFixed(1)}%</div>
+            <div class="src-text">${escapeHtml(s.content || '')}</div>
+        </div>`;
+    });
+    html += '</div></div>';
+    return html;
+}
+
+function renderReasoningHtml(steps, msgIdx) {
+    const id = `reasoning-${msgIdx}`;
+    let html = `<div class="reasoning-block"><button class="reasoning-toggle" onclick="document.getElementById('${id}').style.display=document.getElementById('${id}').style.display==='none'?'block':'none'">🧠 Agent 推理链 (${steps.length} 步)</button>`;
+    html += `<div id="${id}" style="display:none">`;
+    steps.forEach(s => {
+        const icon = s.type === 'tool_call' ? '🔧' : s.type === 'tool_result' ? '📋' : '💬';
+        html += `<div class="step-item"><span class="step-type">${icon} 步骤${s.step} (${s.type})</span>: ${escapeHtml(s.detail)}</div>`;
+    });
+    html += '</div></div>';
+    return html;
+}
+
+function setInputEnabled(enabled) {
+    questionInput.disabled = !enabled;
+    btnSend.disabled = !enabled;
+}
+
+function escapeHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+}
+
+// Update last assistant message in-place (for streaming)
+function updateLastAssistantMsg(updates) {
+    const last = messages[messages.length - 1];
+    if (last && last.role === 'assistant') {
+        Object.assign(last, updates);
+        renderMessages();
+    }
+}
+
+// Handle SSE event from streaming Agent
+function handleSSEEvent(event, data, state) {
+    switch (event) {
+        case 'tool_call':
+            state.reasoningSteps.push({ step: data.step, type: 'tool_call', detail: `调用 ${data.tool}: ${data.args}` });
+            updateLastAssistantMsg({ reasoning_steps: [...state.reasoningSteps] });
+            break;
+        case 'tool_result':
+            state.reasoningSteps.push({ step: data.step, type: 'tool_result', detail: `找到 ${data.found} 条结果` });
+            updateLastAssistantMsg({ reasoning_steps: [...state.reasoningSteps] });
+            break;
+        case 'token':
+            state.answerText += data.token;
+            updateLastAssistantMsg({ content: '<span class="streaming-cursor">' + escapeHtml(state.answerText) + '</span>', _thinking: false });
+            break;
+        case 'sources':
+            state.sources = data.sources || [];
+            updateLastAssistantMsg({ sources: state.sources });
+            break;
+        case 'done':
+            // Remove streaming cursor
+            updateLastAssistantMsg({ content: state.answerText });
+            break;
+        case 'error':
+            updateLastAssistantMsg({ content: '错误：' + escapeHtml(data.message) });
+            break;
+    }
+}
+
+// SSE streaming for Agent mode
+async function sendAgentStreaming(question) {
+    const resp = await fetch(`/api/conversations/${currentConvId}/agent/stream`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, top_k: 4, temperature: 0.3 }),
+    });
+    if (!resp.ok) {
+        const err = await resp.json().catch(() => ({ detail: '请求失败' }));
+        throw new Error(err.detail || '请求失败');
+    }
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    const state = { reasoningSteps: [], sources: [], answerText: '' };
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+
+        let currentEvent = null;
+        for (const line of lines) {
+            if (line.startsWith('event: ')) {
+                currentEvent = line.slice(7).trim();
+            } else if (line.startsWith('data: ') && currentEvent) {
+                try {
+                    const data = JSON.parse(line.slice(6));
+                    handleSSEEvent(currentEvent, data, state);
+                } catch (e) {
+                    // Skip malformed JSON
+                }
+                currentEvent = null;
+            } else if (line === '' && currentEvent) {
+                // Empty line with pending event — skip
+                currentEvent = null;
+            }
+        }
+    }
+}
+
+// Send question
+async function sendQuestion() {
+    if (sending || !currentConvId) return;
+    const question = questionInput.value.trim();
+    if (!question) return;
+
+    sending = true;
+    questionInput.value = '';
+    questionInput.disabled = true;
+    btnSend.disabled = true;
+
+    // Optimistic user message + placeholder assistant
+    messages.push({ role: 'user', content: question });
+    messages.push({ role: 'assistant', content: '思考中...', sources: [], model: '', reasoning_steps: [], _thinking: true });
+    renderMessages();
+
+    try {
+        if (chatMode === 'agent') {
+            await sendAgentStreaming(question);
+        } else {
+            const data = await api(`/api/conversations/${currentConvId}/qa`, {
+                method: 'POST',
+                body: JSON.stringify({ question, top_k: 4, temperature: 0.3 }),
+            });
+            messages = messages.slice(0, -1);
+            if (data.user_message) messages.push({ role: 'user', content: data.user_message.content });
+            if (data.assistant_message) {
+                messages.push({
+                    role: 'assistant',
+                    content: data.answer || data.assistant_message.content,
+                    sources: data.sources || data.assistant_message.sources || [],
+                    model: data.model_used || data.assistant_message.model || '',
+                    reasoning_steps: data.reasoning_steps || [],
+                });
+            }
+            renderMessages();
+        }
+        loadConversations();
+    } catch (err) {
+        messages = messages.slice(0, -1);
+        messages.push({ role: 'assistant', content: '错误：' + err.message, sources: [], model: '' });
+        renderMessages();
+    } finally {
+        sending = false;
+        questionInput.disabled = false;
+        btnSend.disabled = false;
+        questionInput.focus();
+    }
+}
+
+btnSend.addEventListener('click', sendQuestion);
+questionInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendQuestion();
+    }
+});
+
+// Upload
+const btnUpload = $('#btn-upload');
+const fileInput = $('#file-input');
+const modalOverlay = $('#modal-overlay');
+const fileZone = $('#file-zone');
+const uploadKbSelect = $('#upload-kb-select');
+const uploadProgress = $('#upload-progress');
+const btnCancel = $('#btn-cancel');
+const btnConfirm = $('#btn-confirm');
+let selectedFile = null;
+
+btnUpload.addEventListener('click', () => {
+    uploadKbSelect.innerHTML = kbSelect.innerHTML;
+    uploadKbSelect.value = currentKbId;
+    selectedFile = null;
+    fileInput.value = '';
+    fileZone.classList.remove('selected');
+    fileZone.innerHTML = '<div class="icon">📁</div><div class="hint">点击选择 PDF 文件</div>';
+    uploadProgress.style.display = 'none';
+    btnConfirm.disabled = true;
+    modalOverlay.classList.add('show');
+});
+
+btnCancel.addEventListener('click', () => modalOverlay.classList.remove('show'));
+modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) modalOverlay.classList.remove('show'); });
+
+fileZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', () => {
+    const f = fileInput.files[0];
+    if (!f) return;
+    selectedFile = f;
+    const sizeMB = (f.size / 1024 / 1024).toFixed(1);
+    fileZone.classList.add('selected');
+    fileZone.innerHTML = `<div class="file-name">${escapeHtml(f.name)}</div><div class="file-size">${sizeMB} MB</div>`;
+    btnConfirm.disabled = false;
+});
+
+fileZone.addEventListener('dragover', (e) => { e.preventDefault(); fileZone.style.borderColor = '#1a73e8'; });
+fileZone.addEventListener('dragleave', () => { fileZone.style.borderColor = '#d0d0d0'; });
+fileZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    fileZone.style.borderColor = '#d0d0d0';
+    const f = e.dataTransfer.files[0];
+    if (!f || f.type !== 'application/pdf') { alert('仅支持 PDF 文件'); return; }
+    selectedFile = f;
+    fileInput.files = e.dataTransfer.files;
+    fileZone.classList.add('selected');
+    fileZone.innerHTML = `<div class="file-name">${escapeHtml(f.name)}</div><div class="file-size">${(f.size/1024/1024).toFixed(1)} MB</div>`;
+    btnConfirm.disabled = false;
+});
+
+btnConfirm.addEventListener('click', async () => {
+    if (!selectedFile) return;
+    btnConfirm.disabled = true;
+    uploadProgress.style.display = 'block';
+    uploadProgress.querySelector('.bar').style.width = '0%';
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('kb_id', uploadKbSelect.value);
+
+    try {
+        const xhr = new XMLHttpRequest();
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                uploadProgress.querySelector('.bar').style.width = Math.round(e.loaded / e.total * 100) + '%';
+            }
+        });
+        await new Promise((resolve, reject) => {
+            xhr.open('POST', '/api/upload');
+            xhr.onload = () => xhr.status >= 200 && xhr.status < 300 ? resolve(JSON.parse(xhr.responseText)) : reject(new Error(JSON.parse(xhr.responseText).detail || '上传失败'));
+            xhr.onerror = () => reject(new Error('网络错误'));
+            xhr.send(formData);
+        });
+        uploadProgress.querySelector('.bar').style.width = '100%';
+        setTimeout(() => {
+            modalOverlay.classList.remove('show');
+            loadKBs();
+        }, 500);
+    } catch (err) {
+        alert('上传失败：' + err.message);
+        btnConfirm.disabled = false;
+    }
+});
+
+// Init
+(async function init() {
+    await loadKBs();
+    await loadConversations();
+})();
+</script>
+</body>
+</html>
