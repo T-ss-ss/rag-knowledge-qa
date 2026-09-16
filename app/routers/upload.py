@@ -25,6 +25,27 @@ ALLOWED_TYPES = {
 router = APIRouter(prefix="/api/upload", tags=["文档上传"])
 
 
+def _estimate_chunk_pages(page_count: int, chunk_count: int) -> list[int]:
+    """按 chunk 在全文中的相对位置，线性折算每个 chunk 的页码（估算值）。
+
+    页边界在解析层就已丢失（整篇文本一次性切块），所以这里只能估算而非精确定位；
+    若要精确页码，需让解析层逐页返回 (页码, 文本) 并逐页切块。
+
+    页码从 1 开始 —— 全链路约定 page == 0 表示"页码不可知"，若此处产出 0，
+    首块会被误判为未知。（例如 5 页 4 块 -> [1, 2, 3, 4]）
+
+    page_count == 0 表示来源格式的页数不可知（例如未记录页数的 DOCX），
+    此时所有 chunk 的页码统一记为 0。绝不能拿别的计数（如段落数）顶替，
+    否则会编造出不存在的页码。
+    """
+    if page_count <= 0:
+        return [0] * chunk_count
+    return [
+        min(page_count, int(i * page_count / chunk_count) + 1)
+        for i in range(chunk_count)
+    ]
+
+
 def get_pdf_service() -> PDFService:
     return PDFService()
 
@@ -88,8 +109,9 @@ async def upload_file(
     if chunk_count == 0:
         raise EmptyPDFError()
 
-    pages_per_chunk = page_count / max(chunk_count, 1)
-    pages = [int(i * pages_per_chunk) for i in range(chunk_count)]
+    # 页码估算：解析层返回整篇文本 + 总页数，页边界信息已在切块前丢失。
+    # page_count == 0 时（页数不可知）所有 chunk 页码为 0，不编造。
+    pages = _estimate_chunk_pages(page_count, chunk_count)
 
     embeddings = embedding_service.embed_texts(chunks)
     document_id = uuid.uuid4().hex

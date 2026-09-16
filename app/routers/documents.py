@@ -24,7 +24,7 @@ def get_doc_repo() -> DocRepo:
 
 
 @router.get("", summary="文档列表")
-async def list_documents(
+def list_documents(
     kb_id: str = Query(default="default", description="知识库 ID"),
     kb_repo: KBRepo = Depends(get_kb_repo),
     doc_repo: DocRepo = Depends(get_doc_repo),
@@ -37,7 +37,7 @@ async def list_documents(
 
 
 @router.delete("/{document_id}", summary="删除文档")
-async def delete_document(
+def delete_document(
     document_id: str,
     kb_id: str = Query(default="default", description="知识库 ID"),
     vector_store: VectorStoreService = Depends(get_vector_store),

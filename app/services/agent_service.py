@@ -73,8 +73,15 @@ def _parse_tool_args(tool_args: str) -> dict:
 
 
 class AgentService:
-    def __init__(self, vector_store, embedding_service, collection_name: str):
+    def __init__(
+        self,
+        vector_store,
+        embedding_service,
+        collection_name: str,
+        rerank: bool = True,
+    ):
         self.kb_tool = KBTool(embedding_service, vector_store, collection_name)
+        self.rerank = rerank
         self.llm_client = OpenAI(
             api_key=settings.deepseek_api_key,
             base_url=settings.deepseek_base_url,
@@ -100,7 +107,7 @@ class AgentService:
     # ── tool handlers ─────────────────────────────────────────
 
     def _run_kb_search(self, query: str, top_k: int) -> tuple[str, list[dict]]:
-        context, sources = self.kb_tool.search(query, top_k)
+        context, sources = self.kb_tool.search(query, top_k, self.rerank)
         return context or "未找到相关文档。", sources
 
     def _run_web_search(self, query: str, _top_k: int) -> tuple[str, list[dict]]:
@@ -126,7 +133,14 @@ class AgentService:
         for msg in history_msgs:
             role = msg.get("role", "")
             content = msg.get("content", "")
-            if role == "assistant" and content and (content.startswith("[调用工具") or content.startswith("[工具返回")):
+            # tool / system / function 角色不能注入 LLM：
+            # OpenAI 协议要求 tool 消息必须带 tool_call_id，缺失会导致 400
+            if role not in ("user", "assistant"):
+                continue
+            # 过滤 Agent 模式产生的工具调用占位文本
+            if role == "assistant" and content and (
+                content.startswith("[调用工具") or content.startswith("[工具返回")
+            ):
                 continue
             messages.append({"role": role, "content": content})
         messages.append({"role": "user", "content": question})
@@ -154,41 +168,43 @@ class AgentService:
         })
         messages.append({"role": "tool", "content": result_text, "tool_call_id": tc_id})
 
+    def _handle_tool_call(self, messages: list[dict], tc, tool_name: str, tool_args: str,
+                          question: str, top_k: int, step: int,
+                          reasoning_steps: list[dict], all_sources: list[dict],
+                          conversation_id: str) -> int:
+        """执行一次工具调用：记录推理步骤 → 执行 → 写回消息 → 追加 LLM 上下文。
+
+        流式与非流式两条路径共用此方法；SSE 事件由调用方在前后单独 yield。
+        返回本次检索命中的来源条数。
+        """
+        reasoning_steps.append({
+            "step": step, "type": "tool_call",
+            "detail": f"调用 {tool_name}: {tool_args}",
+        })
+
+        result_text, sources = self._execute_tool(tool_name, tool_args, question, top_k)
+        all_sources.extend(sources)
+
+        reasoning_steps.append({
+            "step": step, "type": "tool_result",
+            "detail": f"找到 {len(sources)} 条结果",
+        })
+
+        self._append_tool_messages(messages, tc, tool_name, tool_args, result_text)
+        self._save_tool_messages(conversation_id, tool_name, tool_args, result_text)
+        return len(sources)
+
     def _finalize(self, conversation_id: str, final_answer: str, question: str,
                   unique_sources: list[dict], reasoning_steps: list[dict]) -> dict:
-        from datetime import datetime, timezone
-        from app.db.database import get_db
-
-        conn = get_db()
-        now = datetime.now(timezone.utc).isoformat()
-        sources_json = json.dumps(unique_sources, ensure_ascii=False) if unique_sources else None
-
-        cursor = conn.execute(
-            "INSERT INTO messages (conversation_id, role, content, sources, model, created_at) "
-            "VALUES (?, ?, ?, ?, ?, ?)",
-            (conversation_id, "assistant", final_answer, sources_json, self.model, now),
-        )
-        msg_id = cursor.lastrowid
-
         tool_call_count = sum(1 for s in reasoning_steps if s["type"] == "tool_call")
-        delta = 2 + 2 * tool_call_count
-        conn.execute(
-            "UPDATE conversations SET message_count = message_count + ?, updated_at = ? WHERE id = ?",
-            (delta, now, conversation_id),
+        assistant_msg = self.msg_repo.save_assistant_turn(
+            conversation_id=conversation_id,
+            answer=final_answer,
+            sources=unique_sources,
+            model=self.model,
+            question=question,
+            tool_call_count=tool_call_count,
         )
-
-        row = conn.execute(
-            "SELECT title FROM conversations WHERE id = ?", (conversation_id,)
-        ).fetchone()
-        if row and not row["title"]:
-            conn.execute(
-                "UPDATE conversations SET title = ?, updated_at = ? WHERE id = ?",
-                (question[:30], now, conversation_id),
-            )
-
-        conn.commit()
-
-        assistant_msg = self.msg_repo.get(msg_id)
 
         return {
             "conversation_id": conversation_id,
@@ -275,27 +291,18 @@ class AgentService:
                         tool_name = tc["function"]["name"]
                         tool_args = tc["function"]["arguments"]
 
-                        reasoning_steps.append({
-                            "step": step, "type": "tool_call",
-                            "detail": f"调用 {tool_name}: {tool_args}",
-                        })
                         yield _format_sse("tool_call", {
                             "step": step, "tool": tool_name, "args": tool_args[:200],
                         })
 
-                        result_text, sources = self._execute_tool(tool_name, tool_args, question, top_k)
-                        all_sources.extend(sources)
+                        found = self._handle_tool_call(
+                            messages, tc, tool_name, tool_args, question, top_k,
+                            step, reasoning_steps, all_sources, conversation_id,
+                        )
 
-                        reasoning_steps.append({
-                            "step": step, "type": "tool_result",
-                            "detail": f"找到 {len(sources)} 条结果",
-                        })
                         yield _format_sse("tool_result", {
-                            "step": step, "tool": tool_name, "found": len(sources),
+                            "step": step, "tool": tool_name, "found": found,
                         })
-
-                        self._append_tool_messages(messages, tc, tool_name, tool_args, result_text)
-                        self._save_tool_messages(conversation_id, tool_name, tool_args, result_text)
                 else:
                     final_answer = content_buf
                     reasoning_steps.append({"step": step, "type": "answer", "detail": ""})
@@ -350,24 +357,11 @@ class AgentService:
 
             if msg.tool_calls:
                 for tc in msg.tool_calls:
-                    tool_name = tc.function.name
-                    tool_args = tc.function.arguments
-
-                    reasoning_steps.append({
-                        "step": step, "type": "tool_call",
-                        "detail": f"调用 {tool_name}: {tool_args}",
-                    })
-
-                    result_text, sources = self._execute_tool(tool_name, tool_args, question, top_k)
-                    all_sources.extend(sources)
-
-                    reasoning_steps.append({
-                        "step": step, "type": "tool_result",
-                        "detail": f"找到 {len(sources)} 条结果",
-                    })
-
-                    self._append_tool_messages(messages, tc, tool_name, tool_args, result_text)
-                    self._save_tool_messages(conversation_id, tool_name, tool_args, result_text)
+                    self._handle_tool_call(
+                        messages, tc, tc.function.name, tc.function.arguments,
+                        question, top_k, step, reasoning_steps, all_sources,
+                        conversation_id,
+                    )
             else:
                 final_answer = msg.content or ""
                 reasoning_steps.append({"step": step, "type": "answer", "detail": ""})

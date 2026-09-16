@@ -51,9 +51,11 @@ class WebSearchTool:
             sources.append({
                 "document_id": r.get("url", ""),
                 "filename": r.get("title", "无标题"),
+                # Web 结果没有页码概念，0 = 不适用；前端据此不展示页码
                 "page": 0,
                 "content": (r.get("content") or "")[:500],
                 "relevance_score": round(r.get("score", 0.5), 4),
+                "score_type": "web",
             })
 
         return context, sources

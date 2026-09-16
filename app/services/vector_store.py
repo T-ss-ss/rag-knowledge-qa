@@ -1,8 +1,11 @@
+import logging
 from datetime import datetime, timezone
 
 import chromadb
 
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 class VectorStoreService:
@@ -81,10 +84,18 @@ class VectorStoreService:
         for i, d in enumerate(distances):
             if metadatas and i < len(metadatas):
                 metadatas[i]["relevance_score"] = round(1.0 - d, 4)
+                metadatas[i]["score_type"] = "cosine"
 
         return documents, metadatas
 
     def list_documents(self, collection_name: str) -> list[dict]:
+        """【当前未接入任何端点，属死代码；且 page_count 反推逻辑不可靠】
+
+        page_count 用 max(chunk.page) + 1 反推是错的：chunk 页码本身是按位置
+        线性折算的估算值，最大页码必然小于真实页数（4 个 chunk 永远算不出 100 页）。
+        文档级元数据（含真实 page_count）请一律以 SQLite 的 documents 表为准，
+        见 app/routers/documents.py 与 app/repositories/doc_repo.py。
+        """
         collection = self._get_collection(collection_name)
         if collection is None:
             return []
@@ -137,5 +148,5 @@ class VectorStoreService:
     def delete_collection(self, collection_name: str):
         try:
             self.client.delete_collection(name=collection_name)
-        except (ValueError, Exception):
-            pass
+        except Exception as exc:
+            logger.warning("delete_collection('%s') failed: %s", collection_name, exc)

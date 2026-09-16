@@ -34,7 +34,9 @@ class UploadResponse(BaseModel):
     document_id: str = Field(description="文档唯一标识")
     kb_id: str = Field(description="所属知识库 ID")
     filename: str = Field(description="文件名")
-    page_count: int = Field(description="PDF 页数")
+    page_count: int = Field(
+        description="文档页数；0 表示该格式未记录页数（如未保存过渲染页数的 DOCX）"
+    )
     chunk_count: int = Field(description="切块数量")
     status: str = Field(default="success", description="状态")
 
@@ -64,9 +66,20 @@ class QuestionRequest(BaseModel):
 class SourceChunk(BaseModel):
     document_id: str = Field(description="来源文档 ID")
     filename: str = Field(description="来源文件名")
-    page: int = Field(description="来源页码")
+    page: int = Field(
+        default=0,
+        description="来源页码，按 chunk 位置估算；0 表示页码不可知（Web 结果或未记录页数的文档）",
+    )
+    chunk_index: int = Field(
+        default=-1,
+        description="该片段在文档内的切块序号；-1 表示未知（如 Web 结果）",
+    )
     content: str = Field(description="相关文档片段")
     relevance_score: float = Field(description="相关度分数")
+    score_type: str = Field(
+        default="cosine",
+        description="相关度分数的量纲：cosine（1-余弦距离，-1~1）/ rerank（BGE sigmoid，0~1）/ web（Tavily score）",
+    )
 
 
 class AnswerResponse(BaseModel):
@@ -81,7 +94,9 @@ class AnswerResponse(BaseModel):
 class DocumentInfo(BaseModel):
     document_id: str = Field(description="文档 ID")
     filename: str = Field(description="文件名")
-    page_count: int = Field(description="页数")
+    page_count: int = Field(
+        description="文档页数；0 表示该格式未记录页数（如未保存过渲染页数的 DOCX）"
+    )
     chunk_count: int = Field(description="切块数")
     uploaded_at: str = Field(description="上传时间")
 
@@ -166,6 +181,10 @@ class AgentQARequest(BaseModel):
     question: str = Field(min_length=1, max_length=2000, description="你想问的问题")
     top_k: int = Field(default=4, ge=1, le=20, description="检索文档块数量")
     temperature: float = Field(default=0.3, ge=0.0, le=1.0, description="LLM 温度参数")
+    rerank: bool = Field(
+        default=True,
+        description="是否启用 BGE-Reranker 精排（需全局 RERANK_ENABLED=true 才生效）",
+    )
     max_iterations: int = Field(default=settings.agent_max_iterations, ge=1, le=10, description="Agent 最大推理步数")
 
 

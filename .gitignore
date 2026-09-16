@@ -13,6 +13,15 @@ data/
 chroma_data/
 uploads/
 
+# Local model cache directory.
+# NOTE: when running locally, HuggingFace downloads to ~/.cache/huggingface/hub,
+# NOT here. This directory is only used in Docker, where the Dockerfile sets
+# HF_HOME=/app/models and docker-compose bind-mounts ./models to it.
+models/
+
+# Database migration backups
+*.bak-*
+
 # IDE
 .idea/
 .vscode/

@@ -29,7 +29,7 @@ def get_doc_repo() -> DocRepo:
 
 
 @router.post("", summary="创建知识库")
-async def create_knowledge_base(
+def create_knowledge_base(
     body: KnowledgeBaseCreate,
     kb_repo: KBRepo = Depends(get_kb_repo),
 ):
@@ -41,7 +41,7 @@ async def create_knowledge_base(
 
 
 @router.get("", summary="获取知识库列表")
-async def list_knowledge_bases(
+def list_knowledge_bases(
     kb_repo: KBRepo = Depends(get_kb_repo),
 ):
     kbs = kb_repo.list_all()
@@ -49,7 +49,7 @@ async def list_knowledge_bases(
 
 
 @router.get("/{kb_id}", summary="获取知识库详情")
-async def get_knowledge_base(
+def get_knowledge_base(
     kb_id: str,
     kb_repo: KBRepo = Depends(get_kb_repo),
 ):
@@ -60,7 +60,7 @@ async def get_knowledge_base(
 
 
 @router.put("/{kb_id}", summary="更新知识库")
-async def update_knowledge_base(
+def update_knowledge_base(
     kb_id: str,
     body: KnowledgeBaseUpdate,
     kb_repo: KBRepo = Depends(get_kb_repo),
@@ -77,7 +77,7 @@ async def update_knowledge_base(
 
 
 @router.delete("/{kb_id}", summary="删除知识库")
-async def delete_knowledge_base(
+def delete_knowledge_base(
     kb_id: str,
     vector_store: VectorStoreService = Depends(get_vector_store),
     kb_repo: KBRepo = Depends(get_kb_repo),

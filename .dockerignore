@@ -1,0 +1,44 @@
+# Environment
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Data directories (mounted as volumes)
+data/
+chroma_data/
+uploads/
+
+# Model cache (mounted as volume)
+models/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Claude
+.claude/
+
+# Git
+.git/
+.gitignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Test artifacts
+test_upload.pdf
+test_file.txt
+test_corrupt.docx
+test_real.pdf

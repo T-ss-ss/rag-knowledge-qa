@@ -1,5 +1,5 @@
 from app.config import settings
-from app.services.rag_pipeline import retrieve_context, build_source_list
+from app.services.rag_pipeline import retrieve_context
 
 
 class KBTool:
@@ -10,10 +10,18 @@ class KBTool:
         self.vector_store = vector_store
         self.collection_name = collection_name
 
-    def search(self, question: str, top_k: int = 4) -> tuple[str, list[dict]]:
+    def search(
+        self, question: str, top_k: int = 4, rerank: bool | None = None
+    ) -> tuple[str, list[dict]]:
+        """rerank=None 时沿用全局配置；否则为「请求参数 AND 全局配置」。"""
+        rerank_enabled = (
+            settings.rerank_enabled
+            if rerank is None
+            else (rerank and settings.rerank_enabled)
+        )
         context, sources = retrieve_context(
             self.embedding_service, self.vector_store, self.collection_name,
-            question, top_k, rerank_enabled=settings.rerank_enabled,
+            question, top_k, rerank_enabled=rerank_enabled,
         )
         return context or "未找到相关文档。", sources
 

@@ -42,7 +42,7 @@ RAGent 是一个基于 **RAG (Retrieval-Augmented Generation)** 的智能知识�
 | 📡 SSE 流式输出 | Agent 模式下 token 逐字推送，工具调用/返回实时可见 |
 | 📁 多知识库 | 独立 Collection 隔离，支持 CRUD，默认知识库不可删除 |
 | 🧠 会话记忆 | 多轮对话上下文注入，Agent 模式自动过滤工具消息 |
-| 📎 Sources 引用 | 每个回答标注来源文件名、页码、相关度分数 |
+| 📎 Sources 引用 | 每个回答标注来源文件名、页码（估算）、相关度分数及分数口径 |
 
 ### 附加特性
 
@@ -260,52 +260,76 @@ data: {"conversation_id":"...","message_id":123}
 
 ### 前置条件
 
-- Python 3.10+
 - DeepSeek API Key（[申请](https://platform.deepseek.com)）
 - 阿里云 DashScope API Key（[申请](https://dashscope.console.aliyun.com)）
 - Tavily API Key（可选，仅联网搜索需要，[申请](https://tavily.com)）
+- Docker（推荐） 或 Python 3.10+
 
-### 1. 克隆项目
+---
 
-```bash
-git clone <repo-url>
-cd RAGtest1
-```
-
-### 2. 配置环境变量
+### 方式一：Docker（推荐）
 
 ```bash
+# 1. 克隆项目
+git clone https://github.com/T-ss-ss/rag-knowledge-qa.git
+cd rag-knowledge-qa
+
+# 2. 配置环境变量
 cp .env.example .env
 # 编辑 .env，填入你的 API Key
+
+# 3. 一键启动
+docker compose up -d
 ```
 
-`.env` 内容：
+访问 `http://127.0.0.1:8080/chat`
 
-```env
-DEEPSEEK_API_KEY=sk-xxx
-DEEPSEEK_BASE_URL=https://api.deepseek.com
-CHAT_MODEL=deepseek-chat
+#### Docker 管理的 3 个持久化目录
 
-EMBEDDING_API_KEY=sk-xxx
-EMBEDDING_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
-EMBEDDING_MODEL=text-embedding-v3
+| 目录 | 用途 | 说明 |
+|------|------|------|
+| `./data` | SQLite 数据库 | 知识库、文档、会话、消息记录 |
+| `./chroma_data` | ChromaDB 向量索引 | 文档向量化块，不可丢失 |
+| `./models` | 模型权重目录 | BGE-Reranker v2-m3 本地副本（约 2.1 GB），落在 `models/bge-reranker-v2-m3/` |
 
-TAVILY_API_KEY=tvly-xxx   # 可选
-```
+> 这 3 个目录通过 `docker compose` volume 映射到宿主机，删除容器不会丢失数据。备份时复制这 3 个目录即可。
 
-### 3. 安装依赖
+#### 常用 Docker 命令
 
 ```bash
+docker compose up -d           # 启动（后台）
+docker compose down             # 停止并删除容器（数据保留）
+docker compose restart          # 重启
+docker compose logs -f          # 查看实时日志
+docker compose pull             # 拉取新镜像（如有）
+docker compose up -d --build    # 重新构建并启动（代码更新后）
+```
+
+---
+
+### 方式二：本地 Python 环境
+
+```bash
+# 1. 克隆项目
+git clone https://github.com/T-ss-ss/rag-knowledge-qa.git
+cd rag-knowledge-qa
+
+# 2. 配置环境变量
+cp .env.example .env
+# 编辑 .env，填入你的 API Key
+
+# 3. 安装依赖
 pip install -r requirements.txt
-```
 
-### 4. 启动服务
-
-```bash
+# 4. 启动服务
 uvicorn main:app --reload --port 8080
 ```
 
-### 5. 访问
+访问 `http://127.0.0.1:8080/chat`
+
+---
+
+### 访问入口
 
 | 页面 | 说明 |
 |------|------|
@@ -428,7 +452,7 @@ POST /api/conversations/{id}/agent/stream       # Agent 流式问答（SSE）
 - **RAG + Agent 双模式** — 简单查询用 RAG（快），复杂推理用 Agent（强），前端一键切换
 - **Agent 双工具协同** — 知识库检索 + 联网搜索，Agent 自主编排调用顺序，覆盖静态知识 + 实时信息
 - **SSE 流式输出** — token 逐字渲染 + 推理步骤实时展示，体验接近 ChatGPT
-- **Sources 精确溯源** — 每个回答标注文件名、页码、相关度分数，KB/WEB 来源可区分
+- **Sources 溯源** — 每个回答标注文件名、页码（按 chunk 位置估算）、相关度分数，KB/WEB 来源可区分
 - **多知识库隔离** — 独立 ChromaDB Collection + SQLite FK 关联，支持创建/删除/切换
 - **Rerank 可选降级** — BGE-Reranker 惰性加载，`rerank_enabled=False` 跳过，无 GPU 不阻塞
 - **自动 Schema 迁移** — 检测旧版数据库 CHECK 约束并自动升级，不丢数据
@@ -439,7 +463,7 @@ POST /api/conversations/{id}/agent/stream       # Agent 流式问答（SSE）
 - **共享 RAG 管线** — `rag_pipeline.py` 消除 3 处重复的检索代码
 - **Tool Registry 模式** — dict 映射工具名 → 处理函数，新增工具只需注册无需改 ReAct 循环
 - **线程安全 SQLite** — `threading.local()` 连接隔离 + WAL 模式读写并发
-- **最小化依赖** — 仅 8 个 PyPI 包，不依赖 LangChain 重型框架
+- **最小化依赖** — 仅 13 个直接依赖，未引入 LangChain 重型框架（只用到它的文本切分器）
 - **优雅降级** — Reranker 加载失败 → 回退原始排序；Web Search 失败 → 降级为纯 KB 问答
 
 ---
@@ -464,7 +488,7 @@ POST /api/conversations/{id}/agent/stream       # Agent 流式问答（SSE）
 
 - [ ] 多模态支持：图片上传 + OCR + 图片问答
 - [ ] 用户认证与多租户：JWT + 用户级知识库隔离
-- [ ] Docker 一键部署：`docker-compose up`
+- [x] Docker 一键部署：`docker compose up -d`
 - [ ] RAGAS 评估集成：自动化忠实度/相关性/准确性评测
 - [ ] 知识图谱集成：实体关系抽取 + GraphRAG
 - [ ] 本地模型支持：Ollama / vLLM 替代云端 API

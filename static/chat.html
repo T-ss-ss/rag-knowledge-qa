@@ -96,15 +96,15 @@
         <button data-mode="rag" class="active">RAG</button>
         <button data-mode="agent">Agent</button>
     </div>
-    <button class="btn-upload" id="btn-upload">📄 上传 PDF</button>
+    <button class="btn-upload" id="btn-upload">📄 上传文档</button>
 </header>
-<input type="file" id="file-input" accept=".pdf">
+<input type="file" id="file-input" accept=".pdf,.docx">
 <div class="modal-overlay" id="modal-overlay">
     <div class="modal">
-        <h3>上传 PDF 文档</h3>
+        <h3>上传文档</h3>
         <div class="file-zone" id="file-zone">
             <div class="icon">📁</div>
-            <div class="hint">点击选择 PDF 文件</div>
+            <div class="hint">点击选择 PDF / Word 文件</div>
         </div>
         <select id="upload-kb-select"></select>
         <div class="upload-progress" id="upload-progress"><div class="bar"></div></div>
@@ -289,8 +289,10 @@ function renderSourcesHtml(sources, msgIdx) {
     let html = `<div class="sources-block"><button class="sources-toggle" onclick="document.getElementById('${id}').style.display=document.getElementById('${id}').style.display==='none'?'block':'none'">📄 查看来源 (${sources.length})</button>`;
     html += `<div id="${id}" style="display:none">`;
     sources.forEach((s, i) => {
+        // page = 0 表示页码不可知（Web 结果、未记录页数的文档），此时不展示"第 N 页"
+        const locator = s.page > 0 ? `第${s.page}页 · ` : '';
         html += `<div class="source-card">
-            <div class="src-header"><strong>[${i + 1}] ${s.filename}</strong> 第${s.page}页 · 相关度 ${(s.relevance_score * 100).toFixed(1)}%</div>
+            <div class="src-header"><strong>[${i + 1}] ${s.filename}</strong> ${locator}相关度 ${(s.relevance_score * 100).toFixed(1)}%</div>
             <div class="src-text">${escapeHtml(s.content || '')}</div>
         </div>`;
     });
@@ -473,13 +475,21 @@ const btnCancel = $('#btn-cancel');
 const btnConfirm = $('#btn-confirm');
 let selectedFile = null;
 
+function isAllowedDoc(f) {
+    if (!f) return false;
+    const name = (f.name || '').toLowerCase();
+    if (name.endsWith('.pdf') || name.endsWith('.docx')) return true;
+    return f.type === 'application/pdf' ||
+        f.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+}
+
 btnUpload.addEventListener('click', () => {
     uploadKbSelect.innerHTML = kbSelect.innerHTML;
     uploadKbSelect.value = currentKbId;
     selectedFile = null;
     fileInput.value = '';
     fileZone.classList.remove('selected');
-    fileZone.innerHTML = '<div class="icon">📁</div><div class="hint">点击选择 PDF 文件</div>';
+    fileZone.innerHTML = '<div class="icon">📁</div><div class="hint">点击选择 PDF / Word 文件</div>';
     uploadProgress.style.display = 'none';
     btnConfirm.disabled = true;
     modalOverlay.classList.add('show');
@@ -505,7 +515,7 @@ fileZone.addEventListener('drop', (e) => {
     e.preventDefault();
     fileZone.style.borderColor = '#d0d0d0';
     const f = e.dataTransfer.files[0];
-    if (!f || f.type !== 'application/pdf') { alert('仅支持 PDF 文件'); return; }
+    if (!isAllowedDoc(f)) { alert('仅支持 PDF / Word 文件'); return; }
     selectedFile = f;
     fileInput.files = e.dataTransfer.files;
     fileZone.classList.add('selected');

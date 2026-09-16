@@ -1,14 +1,11 @@
 from openai import OpenAI
-import json
-from datetime import datetime, timezone
 
 from app.config import settings
-from app.db.database import get_db
 from app.repositories.conv_repo import ConvRepo
 from app.repositories.msg_repo import MsgRepo
 from app.services.embedding_service import EmbeddingService
 from app.services.vector_store import VectorStoreService
-from app.services.rag_pipeline import retrieve_context, extract_summary, build_source_list
+from app.services.rag_pipeline import retrieve_context, extract_summary
 
 SYSTEM_PROMPT = """\
 You are a precise question-answering assistant. Answer the user's question \
@@ -72,39 +69,14 @@ class ChatService:
         )
         answer = response.choices[0].message.content or ""
 
-        conn = get_db()
-        now = datetime.now(timezone.utc).isoformat()
-
-        cursor = conn.execute(
-            "INSERT INTO messages (conversation_id, role, content, sources, model, created_at) "
-            "VALUES (?, ?, ?, ?, ?, ?)",
-            (conversation_id, "user", question, None, None, now),
+        user_msg, assistant_msg = self.msg_repo.save_qa_turn(
+            conversation_id=conversation_id,
+            question=question,
+            answer=answer,
+            sources=sources,
+            model=self.model,
+            title_hint=question[:30],
         )
-        user_msg_id = cursor.lastrowid
-
-        sources_json = json.dumps(sources, ensure_ascii=False) if sources else None
-        cursor = conn.execute(
-            "INSERT INTO messages (conversation_id, role, content, sources, model, created_at) "
-            "VALUES (?, ?, ?, ?, ?, ?)",
-            (conversation_id, "assistant", answer, sources_json, self.model, now),
-        )
-        assistant_msg_id = cursor.lastrowid
-
-        conn.execute(
-            "UPDATE conversations SET message_count = message_count + 2, updated_at = ? WHERE id = ?",
-            (now, conversation_id),
-        )
-
-        if not conv["title"]:
-            conn.execute(
-                "UPDATE conversations SET title = ?, updated_at = ? WHERE id = ?",
-                (question[:30], now, conversation_id),
-            )
-
-        conn.commit()
-
-        user_msg = self.msg_repo.get(user_msg_id)
-        assistant_msg = self.msg_repo.get(assistant_msg_id)
 
         return {
             "conversation_id": conversation_id,

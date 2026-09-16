@@ -1,5 +1,7 @@
+import shutil
 import sqlite3
 import threading
+from datetime import datetime
 from pathlib import Path
 
 from app.config import settings
@@ -24,12 +26,28 @@ def get_db() -> sqlite3.Connection:
 
 
 def _migrate_messages_schema(conn: sqlite3.Connection):
-    """Recreate messages table if CHECK constraint is outdated (missing 'tool' role)."""
+    """Recreate messages table if CHECK constraint is outdated (missing 'tool' role).
+
+    注意：整个迁移必须在一个显式事务里完成。Python sqlite3 的默认隔离级别下
+    DDL 不参与隐式事务，如果不显式 BEGIN/COMMIT，脚本执行到 DROP TABLE 之后、
+    ALTER TABLE RENAME 之前中断就会导致数据丢失。迁移前额外做一次文件级备份。
+    """
     row = conn.execute(
         "SELECT sql FROM sqlite_master WHERE type='table' AND name='messages'"
     ).fetchone()
-    if row and "role IN ('user', 'assistant')" in row[0]:
+    if not (row and "role IN ('user', 'assistant')" in row[0]):
+        return
+
+    db_path = Path(settings.sqlite_db_path)
+    if db_path.exists():
+        backup_path = db_path.with_name(
+            f"{db_path.name}.bak-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+        )
+        shutil.copy2(db_path, backup_path)
+
+    try:
         conn.executescript("""
+            BEGIN IMMEDIATE;
             CREATE TABLE messages_new (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 conversation_id TEXT NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
@@ -43,7 +61,14 @@ def _migrate_messages_schema(conn: sqlite3.Connection):
             DROP TABLE messages;
             ALTER TABLE messages_new RENAME TO messages;
             CREATE INDEX IF NOT EXISTS idx_messages_conv_id ON messages(conversation_id);
+            COMMIT;
         """)
+    except Exception:
+        try:
+            conn.execute("ROLLBACK")
+        except sqlite3.Error:
+            pass
+        raise
 
 
 def init_db():

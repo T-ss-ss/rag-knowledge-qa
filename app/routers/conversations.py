@@ -47,7 +47,7 @@ def get_kb_repo() -> KBRepo:
 
 
 @router.post("", summary="创建会话")
-async def create_conversation(
+def create_conversation(
     body: ConversationCreate,
     kb_repo: KBRepo = Depends(get_kb_repo),
     conv_repo: ConvRepo = Depends(get_conv_repo),
@@ -60,7 +60,7 @@ async def create_conversation(
 
 
 @router.get("", summary="会话列表")
-async def list_conversations(
+def list_conversations(
     kb_id: str = Query(default="default", description="知识库 ID"),
     page: int = Query(default=1, ge=1, description="页码"),
     page_size: int = Query(default=20, ge=1, le=100, description="每页条数"),
@@ -71,7 +71,7 @@ async def list_conversations(
 
 
 @router.get("/{conv_id}", summary="会话详情")
-async def get_conversation(
+def get_conversation(
     conv_id: str,
     conv_repo: ConvRepo = Depends(get_conv_repo),
     msg_repo: MsgRepo = Depends(get_msg_repo),
@@ -85,7 +85,7 @@ async def get_conversation(
 
 
 @router.patch("/{conv_id}", summary="修改标题")
-async def update_conversation(
+def update_conversation(
     conv_id: str,
     body: ConversationUpdate,
     conv_repo: ConvRepo = Depends(get_conv_repo),
@@ -97,7 +97,7 @@ async def update_conversation(
 
 
 @router.delete("/{conv_id}", summary="删除会话")
-async def delete_conversation(
+def delete_conversation(
     conv_id: str,
     conv_repo: ConvRepo = Depends(get_conv_repo),
 ):
@@ -109,7 +109,7 @@ async def delete_conversation(
 
 
 @router.post("/{conv_id}/qa", summary="会话内问答", response_model=ConversationQAResponse)
-async def conversation_qa(
+def conversation_qa(
     conv_id: str,
     body: ConversationQARequest,
     request: Request,
@@ -162,7 +162,7 @@ async def conversation_qa(
 
 
 @router.post("/{conv_id}/agent", summary="Agent 模式问答", response_model=AgentQAResponse)
-async def conversation_agent(
+def conversation_agent(
     conv_id: str,
     body: AgentQARequest,
     request: Request,
@@ -203,7 +203,7 @@ async def conversation_agent(
             }
         )
 
-    agent_service = AgentService(vector_store, embedding_service, collection_name)
+    agent_service = AgentService(vector_store, embedding_service, collection_name, rerank=body.rerank)
     result = agent_service.ask(
         conversation_id=conv_id,
         question=body.question,
@@ -244,7 +244,7 @@ async def conversation_agent_stream(
             yield f"event: done\ndata: {_json.dumps({'conversation_id': conv_id, 'message_id': 0})}\n\n"
         return StreamingResponse(_empty_stream(), media_type="text/event-stream")
 
-    agent_service = AgentService(vector_store, embedding_service, collection_name)
+    agent_service = AgentService(vector_store, embedding_service, collection_name, rerank=body.rerank)
     return StreamingResponse(
         agent_service.ask_stream(
             conversation_id=conv_id,

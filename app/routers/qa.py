@@ -24,7 +24,7 @@ def get_kb_repo() -> KBRepo:
 
 
 @router.post("", summary="提交问题", response_model=AnswerResponse)
-async def ask_question(
+def ask_question(
     body: QuestionRequest,
     embedding_service: EmbeddingService = Depends(get_embedding_service),
     vector_store: VectorStoreService = Depends(get_vector_store),

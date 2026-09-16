@@ -3,7 +3,7 @@ from openai import OpenAI
 from app.config import settings
 from app.services.embedding_service import EmbeddingService
 from app.services.vector_store import VectorStoreService
-from app.services.rag_pipeline import retrieve_context, extract_summary, build_source_list
+from app.services.rag_pipeline import retrieve_context, extract_summary
 
 
 SYSTEM_PROMPT = """\

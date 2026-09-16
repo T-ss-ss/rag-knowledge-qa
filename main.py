@@ -35,6 +35,7 @@ app = FastAPI(
     description="上传 PDF 文档，基于 RAG 技术进行智能问答，支持多知识库与聊天历史",
     version="0.4.0",
     lifespan=lifespan,
+    docs_url=None,
 )
 
 app.add_middleware(
@@ -53,6 +54,23 @@ app.include_router(knowledge_bases.router)
 app.include_router(conversations.router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+@app.get("/docs", include_in_schema=False)
+async def api_docs():
+    return HTMLResponse("""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API 文档 · AI 知识库问答系统</title>
+    <style>body { margin: 0; }</style>
+</head>
+<body>
+    <script id="api-reference" data-url="/openapi.json"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+</body>
+</html>""")
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -120,7 +138,6 @@ async def home():
         <div class="buttons">
             <a href="/chat" class="btn">进入聊天界面</a>
             <a href="/docs" class="btn btn-secondary">打开接口文档</a>
-            <a href="/health" class="btn btn-secondary">查看系统状态</a>
         </div>
     </div>
 </body>
@@ -133,7 +150,13 @@ async def chat_page():
 
 
 @app.get("/health", summary="健康检查")
-async def health(request: Request):
+def health(request: Request):
+    """注意：必须是同步 def。
+
+    函数体内有阻塞式网络调用（OpenAI 同步客户端），写成 async def 会占住
+    事件循环，上游 API 异常时整个服务都会失去响应。用 def 时 Starlette
+    会自动把它丢进线程池执行。
+    """
     vector_store: VectorStoreService = request.app.state.vector_store
 
     chat_ok = False
@@ -141,6 +164,8 @@ async def health(request: Request):
         client = OpenAI(
             api_key=settings.deepseek_api_key,
             base_url=settings.deepseek_base_url,
+            timeout=5.0,
+            max_retries=0,
         )
         client.models.list()
         chat_ok = True
@@ -152,6 +177,8 @@ async def health(request: Request):
         client = OpenAI(
             api_key=settings.embedding_api_key,
             base_url=settings.embedding_base_url,
+            timeout=5.0,
+            max_retries=0,
         )
         client.models.list()
         embedding_ok = True

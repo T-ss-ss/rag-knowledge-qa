@@ -1,0 +1,13 @@
+services:
+  app:
+    build: .
+    container_name: rag-qa
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./chroma_data:/app/chroma_data
+      - ./models:/app/models
+    restart: unless-stopped

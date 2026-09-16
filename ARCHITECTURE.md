@@ -504,7 +504,160 @@ data: {"conversation_id":"...","message_id":42}
 
 ---
 
-## 8. 配置项一览
+## 8. API 设计
+
+### 8.1 端点总览
+
+| 方法 | 路径 | 说明 | 认证 |
+|------|------|------|------|
+| GET | `/health` | 健康检查 | 无 |
+| GET | `/chat` | 聊天界面 (SPA) | 无 |
+| POST | `/api/upload` | 上传文档 (PDF/DOCX) | 无 |
+| POST | `/api/qa` | 无状态 RAG 问答 | 无 |
+| GET | `/api/documents` | 文档列表 | 无 |
+| DELETE | `/api/documents/{id}` | 删除文档 | 无 |
+| POST | `/api/knowledge-bases` | 创建知识库 | 无 |
+| GET | `/api/knowledge-bases` | 知识库列表 | 无 |
+| GET | `/api/knowledge-bases/{id}` | 知识库详情 | 无 |
+| PUT | `/api/knowledge-bases/{id}` | 更新知识库 | 无 |
+| DELETE | `/api/knowledge-bases/{id}` | 删除知识库 | 无 |
+| POST | `/api/conversations` | 创建会话 | 无 |
+| GET | `/api/conversations` | 会话列表 (分页) | 无 |
+| GET | `/api/conversations/{id}` | 会话详情 + 消息 | 无 |
+| PATCH | `/api/conversations/{id}` | 更新会话标题 | 无 |
+| DELETE | `/api/conversations/{id}` | 删除会话 | 无 |
+| POST | `/api/conversations/{id}/qa` | 会话内 RAG 问答 | 无 |
+| POST | `/api/conversations/{id}/agent` | Agent 非流式问答 | 无 |
+| POST | `/api/conversations/{id}/agent/stream` | Agent SSE 流式问答 | 无 |
+
+### 8.2 请求/响应模型
+
+#### 上传文档 — `POST /api/upload`
+
+```
+Request:  multipart/form-data
+  file:     UploadFile  (PDF or DOCX, max 50 MB)
+  kb_id:    str         (default: "default")
+
+Response: 200
+  {
+    "document_id": "abc123...",
+    "kb_id":        "default",
+    "filename":     "report.pdf",
+    "page_count":   12,
+    "chunk_count":  24,
+    "status":       "success"
+  }
+```
+
+#### RAG 问答 — `POST /api/qa` / `POST /api/conversations/{id}/qa`
+
+```
+Request:  application/json
+  {
+    "question":         "Python 有什么特点?",  // 1-2000 chars
+    "kb_id":            "default",             // 1-50 chars (仅 /api/qa)
+    "top_k":            4,                     // 1-20
+    "temperature":      0.3,                   // 0.0-1.0
+    "rerank":           true,                  // bool
+    "retrieval_top_k":  0                      // 0-100 (0=auto)
+  }
+
+Response: 200
+  {
+    "answer":           "Python 是...",
+    "summary":          "Python 是一种...",
+    "sources":          [{document_id, filename, page, content, relevance_score}],
+    "model_used":       "deepseek-chat"
+  }
+```
+
+#### Agent 问答 — `POST /api/conversations/{id}/agent`
+
+```
+Request:  application/json
+  {
+    "question":       "Python 有什么特点?",    // 1-2000 chars
+    "top_k":          4,                       // 1-20
+    "temperature":    0.3,                     // 0.0-1.0
+    "max_iterations": 5                        // 1-10
+  }
+
+Response: 200
+  {
+    "answer":           "根据知识库...",
+    "sources":          [...],
+    "reasoning_steps":  [
+      {step: 1, type: "tool_call",  detail: "调用 search_knowledge_base: ..."},
+      {step: 1, type: "tool_result", detail: "找到 4 条结果"},
+      {step: 2, type: "answer",      detail: ""}
+    ],
+    "model_used":       "deepseek-chat"
+  }
+```
+
+#### Agent 流式 — `POST /api/conversations/{id}/agent/stream`
+
+```
+Response: text/event-stream
+
+event: tool_call
+data: {"step":1,"tool":"search_knowledge_base","args":"{...}"}
+
+event: tool_result
+data: {"step":1,"tool":"search_knowledge_base","found":4}
+
+event: token
+data: {"token":"根据"}
+
+event: sources
+data: {"sources":[{...}]}
+
+event: done
+data: {"conversation_id":"...","message_id":42}
+
+event: error
+data: {"message":"LLM 调用失败"}
+```
+
+### 8.3 错误响应格式
+
+所有错误统一返回：
+
+```json
+{
+  "detail": "Knowledge base 'xxx' not found.",
+  "error_code": "KB_NOT_FOUND"
+}
+```
+
+| HTTP | error_code | 触发场景 |
+|------|-----------|---------|
+| 400 | `INVALID_FILE_TYPE` | 上传非 PDF/DOCX 文件 |
+| 400 | `EMPTY_PDF` | PDF 无可提取文本 |
+| 400 | `CORRUPT_PDF` | 文件无法解析 |
+| 400 | `KB_ALREADY_EXISTS` | 知识库重名 |
+| 400 | `DEFAULT_KB_DELETE_FORBIDDEN` | 删除 default 知识库 |
+| 404 | `KB_NOT_FOUND` | 知识库不存在 |
+| 404 | `DOCUMENT_NOT_FOUND` | 文档不存在 |
+| 404 | `CONVERSATION_NOT_FOUND` | 会话不存在 |
+| 413 | `FILE_TOO_LARGE` | 文件超限 |
+| 422 | (Pydantic) | 请求参数校验失败 |
+| 500 | `RERANKER_NOT_AVAILABLE` | Reranker 不可用 |
+
+### 8.4 查询参数约定
+
+| 端点 | 参数 | 类型 | 默认 | 范围 |
+|------|------|------|------|------|
+| `GET /api/documents` | `kb_id` | str | `"default"` | — |
+| `GET /api/conversations` | `kb_id` | str | `"default"` | — |
+| | `page` | int | `1` | >= 1 |
+| | `page_size` | int | `20` | 1-100 |
+| `DELETE /api/documents/{id}` | `kb_id` | str | `"default"` | — |
+
+---
+
+## 9. 配置项一览
 
 | 分类 | 配置项 | 默认值 | 说明 |
 |------|--------|--------|------|

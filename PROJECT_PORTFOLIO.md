@@ -122,7 +122,7 @@ RAGtest1/
 │ External APIs    │       │
 │ ┌──────────────┐ │       │
 │ │ DeepSeek     │◄├───────┤
-│ │ (Chat LLM)  │ │       │
+│ │ (Chat LLM)   │ │       │
 │ └──────────────┘ │       │
 │ ┌──────────────┐ │       │
 │ │ Qwen         │◄├───────┘
@@ -308,9 +308,9 @@ Query Time:
 | **双工具协同** | `search_knowledge_base`（文档检索）+ `search_web`（Tavily 联网搜索），Agent 自主编排调用顺序 |
 | **SSE 流式输出** | Agent 模式下 token 逐字推送，工具调用/返回实时可见，前端原生 `ReadableStream` 消费 |
 | **会话多轮记忆** | 最近 N 条历史注入 LLM，Agent 模式自动过滤工具调用占位消息，RAG 模式过滤 tool/system 角色 |
-| **Sources 精确引用** | 每个回答标注来源文件名、页码、相关度分数，联网搜索区分 KB Source / Web Source |
+| **Sources 引用** | 每个回答标注来源文件名、估算页码、相关度分数与分数口径，联网搜索区分 KB Source / Web Source |
 | **Rerank 可选降级** | BGE-Reranker 惰性加载，`rerank_enabled=False` 直接跳过，不阻塞无 GPU 环境 |
-| **向后兼容 Schema 迁移** | 检测旧版 CHECK 约束并自动重建表，不丢数据 |
+| **向后兼容 Schema 迁移** | 检测旧版 CHECK 约束并自动重建表，全程纳入单个显式事务 + 迁移前文件级备份 |
 | **统一错误处理** | 自定义异常类 + FastAPI `exception_handler` 装饰器，所有错误返回统一 JSON |
 
 ### 4.2 工程亮点
@@ -322,7 +322,7 @@ Query Time:
 | **Tool Registry 模式** | `_tool_handlers` dict 映射工具名 → 处理函数，新增工具只需注册无需改 ReAct 循环 |
 | **线程安全 SQLite** | `threading.local()` 隔离连接，WAL 模式支持读写并发 |
 | **矢量存储降级友好** | Reranker 加载失败自动 fallback 原始排序，Web Search 失败返回错误文本而不崩溃 |
-| **最小化依赖** | 仅 8 个 PyPI 包，无 LangChain 重型框架，直接用 OpenAI SDK |
+| **最小化依赖** | 仅 13 个直接依赖，未引入 LangChain 重型框架（只用到其文本切分器），直接用 OpenAI SDK |
 | **前后端分离** | `main.py` 179 行纯 FastAPI 配置，`static/chat.html` 独立前端，`StaticFiles` 挂载 |
 | **Pydantic 全量校验** | 14 个 Schema 覆盖所有请求/响应，含 Field 约束（length, ge, le）和 description |
 

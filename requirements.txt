@@ -5,8 +5,13 @@ pydantic>=2.0.0,<3.0.0
 pydantic-settings>=2.0.0,<3.0.0
 python-dotenv>=1.0.0,<2.0.0
 openai>=1.50.0,<2.0.0
+requests>=2.31.0,<3.0.0
 chromadb>=1.0.0,<2.0.0
-FlagEmbedding>=1.3.0,<2.0.0
+# FlagEmbedding >= 1.4.2 是硬性要求：该版本新增 utils/tokenizer_compat.py，
+# 修复了 transformers v5 移除慢速 tokenizer 的 prepare_for_model 接口后，
+# 1.4.0/1.4.1 会抛 "XLMRobertaTokenizer has no attribute prepare_for_model"，
+# 而该异常被 RerankerService 捕获后表现为"静默降级、精排永不生效"。
+FlagEmbedding>=1.4.2,<2.0.0
 langchain-text-splitters>=0.3.0,<2.0.0
 pymupdf>=1.24.0,<2.0.0
 python-docx>=1.0.0,<2.0.0
