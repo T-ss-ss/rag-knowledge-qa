@@ -27,8 +27,24 @@
 
 ## 语料
 
-项目根目录下的全部 Markdown 文档（README / ARCHITECTURE / INTERVIEW_ANSWERS /
-TEST_CHECKLIST / FIX_TASKS / PROJECT_PORTFOLIO），约 17 万字符 → **173 个 chunk**。
+`eval/corpus/` 下的 6 份 Markdown **冻结快照**（README / ARCHITECTURE /
+INTERVIEW_ANSWERS / TEST_CHECKLIST / FIX_TASKS / PROJECT_PORTFOLIO），
+约 17 万字符 → **173 个 chunk**。来源提交记录在 `eval/corpus/SOURCE.txt`。
+
+为什么是冻结快照，而不是直接读项目根目录的 `*.md`
+--------------------------------------------------
+踩过一次真实的可复现性事故：最初的实现是 `PROJECT_ROOT.glob("*.md")`，
+跑完评测后为了同步文档又改了 `README.md` / `ARCHITECTURE.md`，
+再重建索引得到的是 **174** 个 chunk（`README.md` 由 19 块变 20 块），
+而标注的 gold 集合是按 `evidence` 原文片段子串匹配得到的，随之漂移——
+`metrics.json` 里的指标再也复现不出来。
+
+**"可复现"是这套评测体系对外的主张，所以语料必须与项目文档解耦**：
+
+```bash
+python eval/build_index.py          # 默认读 eval/corpus/，应输出"合计 173 个 chunk"
+python eval/build_index.py --live   # 调试用：改读项目根目录（结果与 metrics.json 不可比）
+```
 
 为什么不直接评测线上 `kb_default`：它只有 12 个 chunk，而 reranker 的候选池
 默认是 `top_k × retrieval_multiplier = 4 × 3 = 12`，恰好等于全库。此时
@@ -79,14 +95,17 @@ ARCHITECTURE 54%、FIX_TASKS 73%、INTERVIEW_ANSWERS 90%、TEST_CHECKLIST 93%）
 
 | 档 | 配置 | k | 用途 |
 |----|------|---|------|
-| A | 向量 top4 | 4 | `RERANK_ENABLED=false` 时的线上行为（基线） |
-| B | 向量 top12 | 12 | 候选池**上限**：gold 有没有被召进池子 |
-| C | 向量 top12 + 精排 → 4 | 4 | `RERANK_ENABLED=true` 时的线上行为 |
-| D | 混合 top12 → 截断 4 | 4 | 向量 + BM25 经 RRF 融合，不精排 |
+| A | 向量 top4 | 4 | `RERANK_ENABLED=false` 且不混合时的行为（基线） |
+| B | 向量 top12 | 12 | 向量链路候选池**上限**：gold 有没有被召进池子 |
+| C | 向量 top12 + 精排 → 4 | 4 | 向量链路 + `RERANK_ENABLED=true` |
+| D | 混合 top12 → 截断 4 | 4 | `HYBRID_ENABLED=true`（**线上默认**）、不精排 |
 | E | 混合 top12 + 精排 → 4 | 4 | 当前能做到的最好路径 |
+| F | 混合 top12 | 12 | 混合链路候选池**上限**，与 B 对称 |
 
-**B 档的 k 是 12，与其余四档的 k=4 不可直接比较**——它给出的是精排的天花板：
-C 在同一个候选池上把 k=4 的召回补到多少，就说明精排"从池子里捞正确答案"的能力。
+**B / F 两档的 k 是 12，与其余四档的 k=4 不可直接比较**——它们给出的是精排的天花板：
+C（或 E）在同一个候选池上把 k=4 的召回补到多少，就说明精排"从池子里捞正确答案"的能力。
+`E/F` 与 `C/B` 的比值就是**池利用率**（整体 93.0% / 92.1%，分层见
+`python eval/report_coverage.py`）。
 
 ⚠️ 踩过的坑：B 最初写成"向量 top12 → 截断到 4"，结果它在数学上**必然等于 A**
 （同一路向量排序取前 4 条），实测两档四项指标完全相同 0.677 / 0.739 / 0.793 / 0.675，
@@ -123,6 +142,49 @@ python eval/run_eval.py --only C --dataset dataset_46_backup.jsonl --out metrics
 一遍 568M 参数的 Cross-encoder，纯 CPU（无 CUDA）时单次 query 约 21 秒。
 A / B / D 三档只需 1~25 ms，秒级完成。所以调参阶段用 `--only A,B,D` 迭代，
 只在需要精排数据时才跑全量，并用 `--out` 把两批结果分开保存。
+
+## 覆盖率与池利用率（`report_coverage.py`）
+
+汇报里会出现两类"看起来没有出处"的数字，它们都能用一条命令当场算出来
+（纯本地计算，不调用任何 API）：
+
+```bash
+python eval/report_coverage.py
+python eval/report_coverage.py --dataset dataset.jsonl --json eval/results/coverage.json
+```
+
+### 1. 标注覆盖率
+
+| 标注集 | 命中 chunk | 覆盖率 | 文件间区间 |
+|---|---|---|---|
+| `dataset_46_backup.jsonl`（第一版） | 64/173 | **37.0%** | 15.4% ~ 87.1% |
+| `dataset.jsonl`（当前 124 条） | 119/173 | **68.8%** | 50.0% ~ 92.9% |
+
+### 2. 候选池利用率（同链路比值，池上限档取 `recall@12`）
+
+| 链路 | easy | medium | hard | 整体 |
+|---|---|---|---|---|
+| 向量 C/B | 85.0% | 94.2% | **97.0%** | 92.1% |
+| 混合 E/F | 88.0% | 96.4% | 92.0% | **93.0%** |
+
+读法：**瓶颈已从"精排"转向"候选池与切分"**。向量链路里难题已用掉 97% 的上限
+（精排对难档几无空间），而 easy 档只有 85~88%——说明简单题的损失发生在
+候选池根本没捞到，不是重排能救的。
+
+### 3. 精排增益的分难度分布（⚠️ 必须带链路名）
+
+| 同链路对照 | easy | medium | hard |
+|---|---|---|---|
+| **A → C**（向量链路） | +6.4% | **+44.6%** | +26.0% |
+| **D → E**（混合链路，线上默认） | **+27.2%** | **+27.9%** | **+6.7%** |
+
+两条链路的形态**不同**，所以不能说一句"收益集中在中档题"就完事：
+
+- 向量链路：medium 独大、easy 几乎不动
+- 混合链路（线上默认）：easy 与 medium 相当（约 +27%），**只有 hard 掉队**
+  ——因为混合召回已把难题拉到池上限的 86%（D hard 0.8083 / F 上限 0.9375）
+
+唯一跨两种口径都成立的结论是：**hard 从来不是收益最大的那一档**。
 
 ## 精排提速（纯 CPU）
 

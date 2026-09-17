@@ -1,0 +1,74 @@
+{
+  "corpus": {
+    "chunks": 173,
+    "files": 6
+  },
+  "coverage": [
+    {
+      "dataset": "dataset.jsonl",
+      "n_questions": 124,
+      "n_chunks": 173,
+      "covered": 119,
+      "uncovered": 54,
+      "coverage_pct": 68.8,
+      "golds_per_question": 1.54,
+      "unmapped_evidence": [],
+      "per_file_pct": {
+        "PROJECT_PORTFOLIO.md": 50.0,
+        "README.md": 52.6,
+        "ARCHITECTURE.md": 53.8,
+        "FIX_TASKS.md": 70.0,
+        "INTERVIEW_ANSWERS.md": 90.3,
+        "TEST_CHECKLIST.md": 92.9
+      }
+    },
+    {
+      "dataset": "dataset_46_backup.jsonl",
+      "n_questions": 46,
+      "n_chunks": 173,
+      "covered": 64,
+      "uncovered": 109,
+      "coverage_pct": 37.0,
+      "golds_per_question": 2.04,
+      "unmapped_evidence": [],
+      "per_file_pct": {
+        "PROJECT_PORTFOLIO.md": 15.4,
+        "FIX_TASKS.md": 20.0,
+        "ARCHITECTURE.md": 25.6,
+        "TEST_CHECKLIST.md": 28.6,
+        "README.md": 47.4,
+        "INTERVIEW_ANSWERS.md": 87.1
+      }
+    }
+  ],
+  "pool": {
+    "overall": {
+      "向量链路 C/B": 92.1,
+      "混合链路 E/F": 93.0
+    },
+    "by_difficulty": {
+      "向量链路 C/B": {
+        "easy": 85.0,
+        "medium": 94.2,
+        "hard": 97.0
+      },
+      "混合链路 E/F": {
+        "easy": 88.0,
+        "medium": 96.4,
+        "hard": 92.0
+      }
+    },
+    "rerank_gain": {
+      "A→C 向量链路": {
+        "easy": 6.4,
+        "medium": 44.6,
+        "hard": 26.0
+      },
+      "D→E 混合链路": {
+        "easy": 27.2,
+        "medium": 27.9,
+        "hard": 6.7
+      }
+    }
+  }
+}

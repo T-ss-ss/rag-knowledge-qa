@@ -2,37 +2,39 @@
   "chunk_size": 1000,
   "chunk_overlap": 200,
   "embedding_model": "text-embedding-v3",
+  "corpus": "eval/corpus (frozen)",
   "files": {
     "ARCHITECTURE.md": {
-      "sha256_16": "31546f0ed8845e27",
+      "sha256_16": "e0d5b82e880d5824",
       "chars": 23782,
       "chunks": 39
     },
     "FIX_TASKS.md": {
-      "sha256_16": "3bd59661555620b2",
+      "sha256_16": "c4501eb7def383b0",
       "chars": 22493,
       "chunks": 30
     },
     "INTERVIEW_ANSWERS.md": {
-      "sha256_16": "2581a693efa80efc",
+      "sha256_16": "50e869e2fd51dc37",
       "chars": 25418,
       "chunks": 31
     },
     "PROJECT_PORTFOLIO.md": {
-      "sha256_16": "2a0b98c7bafbfffd",
+      "sha256_16": "4e63a0f173ff4c7b",
       "chars": 16151,
       "chunks": 26
     },
     "README.md": {
-      "sha256_16": "7ac56eda24aa629a",
+      "sha256_16": "9aa996210a95b4fd",
       "chars": 13345,
       "chunks": 19
     },
     "TEST_CHECKLIST.md": {
-      "sha256_16": "aafdf4f95df5d0d0",
+      "sha256_16": "82f4c0e1ae178303",
       "chars": 23096,
       "chunks": 28
     }
   },
+  "corpus_source": "评测语料冻结快照\n================\n\n这 6 份 Markdown 是检索评测的语料，**刻意与项目文档解耦**——它们是快照，不会随\nREADME.md / ARCHITECTURE.md 的后续修改而漂移。\n\n来源\n----\n取自 git 提交 721fde6d43a4aac1cd5b55aaf899c605311b8de6\n（2026-09-17 \"feat: 混合检索(BM25+RRF)与可复现检索评测体系\"）。\n该提交是 eval/results/metrics.json 中全部指标对应的语料版本。\n\n为什么要冻结\n------------\n最初的实现是 `PROJECT_ROOT.glob(\"*.md\")`，踩过一次真实的可复现性事故：\n跑完评测后为同步文档改了 README.md / ARCHITECTURE.md，再重建索引得到 **174**\n个 chunk（评测时是 **173**，README.md 由 19 块变 20 块），\n标注的 gold 集合（由 evidence 原文片段子串匹配得到）随之漂移，\nmetrics.json 里的指标就再也复现不出来。\n\n「可复现」是这套评测体系对外的主张，所以语料必须冻结。\n\n验证一致性\n----------\n    python eval/build_index.py          # 应输出 \"合计 173 个 chunk\"\n    python eval/report_coverage.py      # 应输出 chunk 覆盖 68.8%（124 条标注）\n\n若两者数字都对得上，说明语料、索引与标注仍然自洽。\n\n维护约定\n--------\n- 快照目录内**不要放 .md 文件**作说明（会被 glob 当成语料），说明写在本文件。\n- 确需更换语料时：替换文件 → 重建索引 → **必须连同 run_eval.py 全量重跑**\n  （约 40 分钟），否则指标与标注不再对应。",
   "total_chunks": 173
 }
