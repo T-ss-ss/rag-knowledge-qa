@@ -78,7 +78,8 @@ class SourceChunk(BaseModel):
     relevance_score: float = Field(description="相关度分数")
     score_type: str = Field(
         default="cosine",
-        description="相关度分数的量纲：cosine（1-余弦距离，-1~1）/ rerank（BGE sigmoid，0~1）/ web（Tavily score）",
+        description="相关度分数的量纲：cosine（1-余弦距离，-1~1）/ rrf（多路融合分，无固定上界）/ "
+        "rerank（BGE sigmoid，0~1）/ web（Tavily score）",
     )
 
 

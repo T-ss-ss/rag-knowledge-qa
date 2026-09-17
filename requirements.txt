@@ -13,5 +13,9 @@ chromadb>=1.0.0,<2.0.0
 # 而该异常被 RerankerService 捕获后表现为"静默降级、精排永不生效"。
 FlagEmbedding>=1.4.2,<2.0.0
 langchain-text-splitters>=0.3.0,<2.0.0
+# 混合检索的 BM25 侧需要中文分词（bm25_retriever.py）。纯 Python，无编译产物。
+jieba>=0.42.1,<1.0.0
 pymupdf>=1.24.0,<2.0.0
 python-docx>=1.0.0,<2.0.0
+# 评测脚本（eval/）用 numpy 做嵌入缓存；chromadb 本身已依赖它，这里显式声明
+numpy>=1.26.0,<3.0.0

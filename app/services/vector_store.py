@@ -66,27 +66,55 @@ class VectorStoreService:
         )
         return len(chunks)
 
-    def query(
+    def query_with_ids(
         self, collection_name: str, query_embedding: list[float], top_k: int
-    ) -> tuple[list[str], list[dict]]:
+    ) -> tuple[list[str], list[str], list[dict]]:
+        """稠密检索，返回 (ids, documents, metadatas)。
+
+        混合检索做 RRF 融合时需要 chunk id 才能把两路结果对齐，
+        所以单独暴露带 id 的版本；query() 是它的无 id 封装。
+        """
         collection = self._get_collection(collection_name)
         if collection is None:
-            return [], []
+            return [], [], []
         results = collection.query(
             query_embeddings=[query_embedding],
             n_results=top_k,
             include=["documents", "metadatas", "distances"],
         )
+        ids = results.get("ids", [[]])[0]
         documents = results.get("documents", [[]])[0]
         metadatas = results.get("metadatas", [[]])[0]
         distances = results.get("distances", [[]])[0]
 
         for i, d in enumerate(distances):
-            if metadatas and i < len(metadatas):
+            if i < len(metadatas):
                 metadatas[i]["relevance_score"] = round(1.0 - d, 4)
                 metadatas[i]["score_type"] = "cosine"
 
+        return ids, documents, metadatas
+
+    def query(
+        self, collection_name: str, query_embedding: list[float], top_k: int
+    ) -> tuple[list[str], list[dict]]:
+        _, documents, metadatas = self.query_with_ids(
+            collection_name, query_embedding, top_k
+        )
         return documents, metadatas
+
+    def get_all_chunks(
+        self, collection_name: str
+    ) -> tuple[list[str], list[str], list[dict]]:
+        """取集合内全部 chunk，供 BM25 构建内存索引。"""
+        collection = self._get_collection(collection_name)
+        if collection is None or collection.count() == 0:
+            return [], [], []
+        results = collection.get(include=["documents", "metadatas"])
+        return (
+            results.get("ids", []),
+            results.get("documents", []),
+            results.get("metadatas", []),
+        )
 
     def list_documents(self, collection_name: str) -> list[dict]:
         """【当前未接入任何端点，属死代码；且 page_count 反推逻辑不可靠】

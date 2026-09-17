@@ -14,10 +14,16 @@ chroma_data/
 uploads/
 
 # Local model cache directory.
-# NOTE: when running locally, HuggingFace downloads to ~/.cache/huggingface/hub,
-# NOT here. This directory is only used in Docker, where the Dockerfile sets
-# HF_HOME=/app/models and docker-compose bind-mounts ./models to it.
+# 本地运行与 Docker 都指向这里：本地由 config.reranker_cache_dir 控制
+# （reranker_service 会把它传给 FlagReranker 的 cache_dir），
+# Docker 由 Dockerfile 的 HF_HOME=/app/models + docker-compose 的 ./models 卷挂载。
+# 目前含 bge-reranker-v2-m3，约 2.14 GB。
 models/
+
+# 评测产物：索引与嵌入缓存都可由 eval/build_index.py 重建；
+# eval/results/ 是结论性数据，保留入库。
+eval/.chroma_eval/
+eval/.cache/
 
 # Database migration backups
 *.bak-*

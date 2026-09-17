@@ -1,0 +1,38 @@
+{
+  "chunk_size": 1000,
+  "chunk_overlap": 200,
+  "embedding_model": "text-embedding-v3",
+  "files": {
+    "ARCHITECTURE.md": {
+      "sha256_16": "31546f0ed8845e27",
+      "chars": 23782,
+      "chunks": 39
+    },
+    "FIX_TASKS.md": {
+      "sha256_16": "3bd59661555620b2",
+      "chars": 22493,
+      "chunks": 30
+    },
+    "INTERVIEW_ANSWERS.md": {
+      "sha256_16": "2581a693efa80efc",
+      "chars": 25418,
+      "chunks": 31
+    },
+    "PROJECT_PORTFOLIO.md": {
+      "sha256_16": "2a0b98c7bafbfffd",
+      "chars": 16151,
+      "chunks": 26
+    },
+    "README.md": {
+      "sha256_16": "7ac56eda24aa629a",
+      "chars": 13345,
+      "chunks": 19
+    },
+    "TEST_CHECKLIST.md": {
+      "sha256_16": "aafdf4f95df5d0d0",
+      "chars": 23096,
+      "chunks": 28
+    }
+  },
+  "total_chunks": 173
+}
