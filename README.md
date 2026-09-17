@@ -35,7 +35,8 @@ RAGent 是一个基于 **RAG (Retrieval-Augmented Generation)** 的智能知识�
 |------|------|
 | 📄 文档上传 | PDF / DOCX，PyMuPDF + python-docx 解析，自动文本提取、分块、向量化 |
 | 🔍 语义检索 | ChromaDB HNSW 索引 + Cosine 相似度，毫秒级检索 |
-| 🎯 Rerank 精排 | BGE-Reranker v2-m3 对粗筛结果重排序，提升 Top-K 精度 |
+| 🔀 混合检索 | 向量召回 + 自实现 BM25（jieba 分词）双路，RRF 融合：实测 Recall@4 提升 10%，代价仅 +23ms |
+| 🎯 Rerank 精排 | BGE-Reranker v2-m3 对粗筛结果重排序：实测 Recall@4 0.677 → 0.781（+15.4%），困难题提升最明显（+19.5%）。纯 CPU 单次约 10 秒（int8 量化后），故默认关闭 |
 | 💬 RAG 问答 | 检索增强生成，严格依据文档上下文作答 |
 | 🤖 Agent 模式 | ReAct + OpenAI Function Calling，自主决策工具调用 |
 | 🌐 联网搜索 | Tavily Search API，Agent 可检索互联网最新信息 |
@@ -43,6 +44,7 @@ RAGent 是一个基于 **RAG (Retrieval-Augmented Generation)** 的智能知识�
 | 📁 多知识库 | 独立 Collection 隔离，支持 CRUD，默认知识库不可删除 |
 | 🧠 会话记忆 | 多轮对话上下文注入，Agent 模式自动过滤工具消息 |
 | 📎 Sources 引用 | 每个回答标注来源文件名、页码（估算）、相关度分数及分数口径 |
+| 📊 检索质量评测 | 124 条标注 / 173 chunk 语料 / 六档配置对比，量化 Recall·Hit@1·MRR·nDCG 与延迟，确定性指标可作回归测试（见 [`eval/`](eval/README.md)） |
 
 ### 附加特性
 
@@ -454,7 +456,8 @@ POST /api/conversations/{id}/agent/stream       # Agent 流式问答（SSE）
 - **SSE 流式输出** — token 逐字渲染 + 推理步骤实时展示，体验接近 ChatGPT
 - **Sources 溯源** — 每个回答标注文件名、页码（按 chunk 位置估算）、相关度分数，KB/WEB 来源可区分
 - **多知识库隔离** — 独立 ChromaDB Collection + SQLite FK 关联，支持创建/删除/切换
-- **Rerank 可选降级** — BGE-Reranker 惰性加载，`rerank_enabled=False` 跳过，无 GPU 不阻塞
+- **Rerank 可选降级** — BGE-Reranker 惰性加载，`rerank_enabled=False` 跳过，无 GPU 不阻塞；
+  对 Linear 层做动态 int8 量化后单次耗时 21.7s → 10.0s（2.18x），且 Recall@4 / Hit@1 / MRR@4 与 fp32 完全一致
 - **自动 Schema 迁移** — 检测旧版数据库 CHECK 约束并自动升级，不丢数据
 
 ### 工程亮点

@@ -672,11 +672,15 @@ data: {"message":"LLM 调用失败"}
 | **分块** | `CHUNK_SIZE` | `1000` | 分块大小 |
 | | `CHUNK_OVERLAP` | `200` | 分块重叠 |
 | **Reranker** | `RERANKER_MODEL` | `BAAI/bge-reranker-v2-m3` | 重排序模型 |
-| | `RERANK_ENABLED` | `False` | 是否启用 |
-| | `RETRIEVAL_MULTIPLIER` | `3` | 检索扩展倍数 |
+| | `RERANK_ENABLED` | `False` | 是否启用。有效值需与请求参数取 AND；纯 CPU 单次约 10s，故默认关闭 |
+| | `RETRIEVAL_MULTIPLIER` | `3` | 检索扩展倍数（候选池 = top_k × 3） |
+| | `RERANK_MAX_LENGTH` | `512` | 候选截断长度。实测调到 256 会让 Recall@4 掉 15.5%，不建议改小 |
+| | `RERANK_QUANTIZE` | `True` | Linear 层动态 int8 量化，2.18x 且指标无损 |
+| **混合检索** | `HYBRID_ENABLED` | `True` | 向量 + BM25 双路召回，RRF 融合 |
+| | `RRF_K` | `60` | RRF 平滑常数（原论文取值） |
 | **Agent** | `AGENT_MAX_ITERATIONS` | `5` | ReAct 最大迭代 |
 | **Web** | `TAVILY_API_KEY` | — | Tavily 搜索 API（可选） |
 | **限制** | `MAX_FILE_SIZE_MB` | `50` | 最大上传 |
 | | `MAX_QUESTION_LENGTH` | `2000` | 最大问题长度 |
 | | `DEFAULT_TOP_K` | `4` | 默认检索数量 |
-| | `EMBEDDING_BATCH_SIZE` | `20` | 嵌入批处理 |
+| | `EMBEDDING_BATCH_SIZE` | `10` | 嵌入批处理（DashScope text-embedding-v3 单次上限即 10） |

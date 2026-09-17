@@ -46,6 +46,19 @@ class Settings(BaseSettings):
     rerank_enabled: bool = False
     retrieval_multiplier: int = 3
 
+    # 精排推理优化（纯 CPU 环境下的提速，实测见 eval/README.md）
+    #
+    # max_length：单条候选截断到多少 token。**保持 512（模型默认值），不要调小**。
+    #   实测 256 虽然快 1.7x，但 Recall@4 从 0.781 掉到 0.660（-15.5%）——
+    #   chunk 约 1000 字符（中文 ≈ 700 token），截到 256 会把尾部信息整段丢掉，
+    #   代价远超收益。384 几乎不提速（14.98s vs 15.39s），也没有使用价值。
+    #
+    # quantize：动态 int8 量化 Linear 层。实测 Recall@4/Hit@1/MRR@4 与 fp32
+    #   **完全一致**（0.7812 / 0.7391 / 0.8116），nDCG@4 仅降 0.4%，而耗时
+    #   21.7s → 10.0s（2.18x）。这是当前唯一"无损"的提速手段。
+    rerank_max_length: int = 512
+    rerank_quantize: bool = True
+
     # 模型权重缓存目录。相对路径按【项目根】解析（不是进程工作目录），
     # 默认落在项目内 ./models —— 与 Docker 的 HF_HOME=/app/models 指向同一位置，
     # 避免权重散落到 C 盘用户目录（默认会是 ~/.cache/huggingface/hub）。

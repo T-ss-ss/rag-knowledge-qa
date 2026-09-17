@@ -1,0 +1,2114 @@
+{
+  "top_k": 4,
+  "n_questions_total": 46,
+  "n_questions_valid": 46,
+  "n_multi_gold": 34,
+  "invalid_evidence": [],
+  "corpus_chunks": 173,
+  "configs": {
+    "C": {
+      "label": "向量 top12 + 精排 → 4",
+      "hybrid": false,
+      "rerank": true,
+      "pool": 12,
+      "top_k": 4,
+      "n": 46,
+      "recall@4": 0.6598,
+      "hit@4": 0.913,
+      "hit@1": 0.7609,
+      "mrr@4": 0.837,
+      "ndcg@4": 0.6673,
+      "latency_ms": 5737.5
+    },
+    "E": {
+      "label": "混合 top12 + 精排 → 4",
+      "hybrid": true,
+      "rerank": true,
+      "pool": 12,
+      "top_k": 4,
+      "n": 46,
+      "recall@4": 0.6453,
+      "hit@4": 0.913,
+      "hit@1": 0.7826,
+      "mrr@4": 0.8406,
+      "ndcg@4": 0.6617,
+      "latency_ms": 4995.4
+    }
+  },
+  "by_difficulty": {
+    "C": {
+      "easy": {
+        "n": 17,
+        "hit@1": 0.7059,
+        "mrr@4": 0.7647,
+        "recall@4": 0.6274
+      },
+      "hard": {
+        "n": 10,
+        "hit@1": 0.8,
+        "mrr@4": 0.9,
+        "recall@4": 0.6667
+      },
+      "medium": {
+        "n": 19,
+        "hit@1": 0.7895,
+        "mrr@4": 0.8684,
+        "recall@4": 0.6851
+      }
+    },
+    "E": {
+      "easy": {
+        "n": 17,
+        "hit@1": 0.7059,
+        "mrr@4": 0.7647,
+        "recall@4": 0.6176
+      },
+      "hard": {
+        "n": 10,
+        "hit@1": 0.8,
+        "mrr@4": 0.9,
+        "recall@4": 0.6667
+      },
+      "medium": {
+        "n": 19,
+        "hit@1": 0.8421,
+        "mrr@4": 0.8772,
+        "recall@4": 0.6588
+      }
+    }
+  },
+  "details": {
+    "C": [
+      {
+        "qid": "q01",
+        "category": "rag",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_2581a693efa8_27",
+          "doc_31546f0ed884_16",
+          "doc_3bd596615556_18",
+          "doc_2581a693efa8_4"
+        ],
+        "gold": [
+          "doc_7ac56eda24aa_7",
+          "doc_7ac56eda24aa_8"
+        ],
+        "first_gold_rank": 0,
+        "recall": 0.0,
+        "hit_k": 0.0,
+        "hit_1": 0.0,
+        "rr": 0.0,
+        "ndcg": 0.0,
+        "latency_ms": 36341.5
+      },
+      {
+        "qid": "q02",
+        "category": "retrieval",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_2",
+          "doc_2581a693efa8_3",
+          "doc_3bd596615556_15",
+          "doc_31546f0ed884_29"
+        ],
+        "gold": [
+          "doc_2581a693efa8_1",
+          "doc_2581a693efa8_2"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 5027.1
+      },
+      {
+        "qid": "q03",
+        "category": "retrieval",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_3bd596615556_5",
+          "doc_2581a693efa8_3",
+          "doc_2581a693efa8_23",
+          "doc_2a0b98c7bafb_19"
+        ],
+        "gold": [
+          "doc_2581a693efa8_2",
+          "doc_2581a693efa8_3"
+        ],
+        "first_gold_rank": 2,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 0.0,
+        "rr": 0.5,
+        "ndcg": 0.3869,
+        "latency_ms": 4899.7
+      },
+      {
+        "qid": "q04",
+        "category": "retrieval",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_23",
+          "doc_2581a693efa8_3",
+          "doc_2581a693efa8_29",
+          "doc_3bd596615556_15"
+        ],
+        "gold": [
+          "doc_2581a693efa8_22",
+          "doc_2581a693efa8_23"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 4913.2
+      },
+      {
+        "qid": "q05",
+        "category": "retrieval",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_2a0b98c7bafb_25",
+          "doc_2581a693efa8_22",
+          "doc_2581a693efa8_2",
+          "doc_2581a693efa8_4"
+        ],
+        "gold": [
+          "doc_2581a693efa8_22",
+          "doc_2a0b98c7bafb_25"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 5055.2
+      },
+      {
+        "qid": "q06",
+        "category": "chunking",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_4",
+          "doc_2581a693efa8_3",
+          "doc_3bd596615556_29",
+          "doc_3bd596615556_24"
+        ],
+        "gold": [
+          "doc_2581a693efa8_3",
+          "doc_2581a693efa8_4"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 4962.3
+      },
+      {
+        "qid": "q07",
+        "category": "chunking",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_2581a693efa8_4",
+          "doc_2581a693efa8_3",
+          "doc_3bd596615556_29",
+          "doc_2581a693efa8_23"
+        ],
+        "gold": [
+          "doc_2581a693efa8_3",
+          "doc_2581a693efa8_4"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 4910.5
+      },
+      {
+        "qid": "q08",
+        "category": "architecture",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_31546f0ed884_2",
+          "doc_2a0b98c7bafb_5",
+          "doc_3bd596615556_11",
+          "doc_3bd596615556_28"
+        ],
+        "gold": [
+          "doc_31546f0ed884_1",
+          "doc_31546f0ed884_2"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 4992.7
+      },
+      {
+        "qid": "q09",
+        "category": "architecture",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_2581a693efa8_16",
+          "doc_31546f0ed884_7",
+          "doc_2a0b98c7bafb_20",
+          "doc_2581a693efa8_15"
+        ],
+        "gold": [
+          "doc_31546f0ed884_7"
+        ],
+        "first_gold_rank": 2,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 0.0,
+        "rr": 0.5,
+        "ndcg": 0.6309,
+        "latency_ms": 4987.2
+      },
+      {
+        "qid": "q10",
+        "category": "architecture",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_2581a693efa8_15",
+          "doc_3bd596615556_10",
+          "doc_3bd596615556_9",
+          "doc_3bd596615556_8"
+        ],
+        "gold": [
+          "doc_3bd596615556_9",
+          "doc_3bd596615556_10"
+        ],
+        "first_gold_rank": 2,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 0.0,
+        "rr": 0.5,
+        "ndcg": 0.6934,
+        "latency_ms": 5055.4
+      },
+      {
+        "qid": "q11",
+        "category": "architecture",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_31546f0ed884_7",
+          "doc_2a0b98c7bafb_20",
+          "doc_2581a693efa8_16",
+          "doc_2a0b98c7bafb_9"
+        ],
+        "gold": [
+          "doc_31546f0ed884_7"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 5059.9
+      },
+      {
+        "qid": "q12",
+        "category": "database",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_31546f0ed884_25",
+          "doc_aafdf4f95df5_7",
+          "doc_7ac56eda24aa_15",
+          "doc_aafdf4f95df5_9"
+        ],
+        "gold": [
+          "doc_31546f0ed884_25",
+          "doc_2581a693efa8_10",
+          "doc_2a0b98c7bafb_16"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.3333,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.4693,
+        "latency_ms": 5129.2
+      },
+      {
+        "qid": "q13",
+        "category": "database",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_11",
+          "doc_2a0b98c7bafb_24",
+          "doc_2581a693efa8_20",
+          "doc_2581a693efa8_10"
+        ],
+        "gold": [
+          "doc_2581a693efa8_10",
+          "doc_2581a693efa8_11"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.8772,
+        "latency_ms": 5218.3
+      },
+      {
+        "qid": "q14",
+        "category": "database",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_3bd596615556_22",
+          "doc_2581a693efa8_19",
+          "doc_2581a693efa8_20",
+          "doc_2581a693efa8_23"
+        ],
+        "gold": [
+          "doc_3bd596615556_21",
+          "doc_3bd596615556_22",
+          "doc_3bd596615556_23",
+          "doc_2581a693efa8_19"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6367,
+        "latency_ms": 5214.8
+      },
+      {
+        "qid": "q15",
+        "category": "database",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_3bd596615556_22",
+          "doc_2581a693efa8_19",
+          "doc_3bd596615556_24",
+          "doc_2581a693efa8_20"
+        ],
+        "gold": [
+          "doc_3bd596615556_22",
+          "doc_3bd596615556_23",
+          "doc_3bd596615556_28",
+          "doc_2581a693efa8_19",
+          "doc_2581a693efa8_20"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.6,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.8048,
+        "latency_ms": 5083.9
+      },
+      {
+        "qid": "q16",
+        "category": "database",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_2581a693efa8_19",
+          "doc_2581a693efa8_20",
+          "doc_3bd596615556_22",
+          "doc_3bd596615556_24"
+        ],
+        "gold": [
+          "doc_2581a693efa8_20"
+        ],
+        "first_gold_rank": 2,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 0.0,
+        "rr": 0.5,
+        "ndcg": 0.6309,
+        "latency_ms": 5153.1
+      },
+      {
+        "qid": "q17",
+        "category": "api",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_31546f0ed884_8",
+          "doc_31546f0ed884_32",
+          "doc_aafdf4f95df5_4",
+          "doc_aafdf4f95df5_5"
+        ],
+        "gold": [
+          "doc_31546f0ed884_8"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 5131.6
+      },
+      {
+        "qid": "q18",
+        "category": "api",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_31546f0ed884_9",
+          "doc_2581a693efa8_28",
+          "doc_aafdf4f95df5_10",
+          "doc_aafdf4f95df5_14"
+        ],
+        "gold": [
+          "doc_31546f0ed884_9"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 4929.8
+      },
+      {
+        "qid": "q19",
+        "category": "api",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_aafdf4f95df5_7",
+          "doc_aafdf4f95df5_3",
+          "doc_aafdf4f95df5_2",
+          "doc_31546f0ed884_0"
+        ],
+        "gold": [
+          "doc_7ac56eda24aa_15"
+        ],
+        "first_gold_rank": 0,
+        "recall": 0.0,
+        "hit_k": 0.0,
+        "hit_1": 0.0,
+        "rr": 0.0,
+        "ndcg": 0.0,
+        "latency_ms": 4943.2
+      },
+      {
+        "qid": "q20",
+        "category": "api",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_31546f0ed884_31",
+          "doc_3bd596615556_8",
+          "doc_3bd596615556_9",
+          "doc_3bd596615556_27"
+        ],
+        "gold": [
+          "doc_31546f0ed884_31"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 5014.3
+      },
+      {
+        "qid": "q21",
+        "category": "agent",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_5",
+          "doc_2581a693efa8_6",
+          "doc_7ac56eda24aa_9",
+          "doc_3bd596615556_17"
+        ],
+        "gold": [
+          "doc_2581a693efa8_5",
+          "doc_2581a693efa8_6",
+          "doc_2a0b98c7bafb_23"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.6667,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.7654,
+        "latency_ms": 5159.9
+      },
+      {
+        "qid": "q22",
+        "category": "agent",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_2581a693efa8_9",
+          "doc_aafdf4f95df5_18",
+          "doc_2581a693efa8_6",
+          "doc_31546f0ed884_34"
+        ],
+        "gold": [
+          "doc_2581a693efa8_8",
+          "doc_2581a693efa8_9",
+          "doc_2a0b98c7bafb_23"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.3333,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.4693,
+        "latency_ms": 5062.5
+      },
+      {
+        "qid": "q23",
+        "category": "agent",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_7ac56eda24aa_9",
+          "doc_2581a693efa8_13",
+          "doc_31546f0ed884_10",
+          "doc_3bd596615556_3"
+        ],
+        "gold": [
+          "doc_7ac56eda24aa_9"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 5121.4
+      },
+      {
+        "qid": "q24",
+        "category": "agent",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_2581a693efa8_13",
+          "doc_3bd596615556_4",
+          "doc_3bd596615556_1",
+          "doc_3bd596615556_3"
+        ],
+        "gold": [
+          "doc_2581a693efa8_12",
+          "doc_2581a693efa8_13"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 5069.5
+      },
+      {
+        "qid": "q25",
+        "category": "sse",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_31546f0ed884_11",
+          "doc_31546f0ed884_34",
+          "doc_7ac56eda24aa_0",
+          "doc_2a0b98c7bafb_22"
+        ],
+        "gold": [
+          "doc_7ac56eda24aa_2"
+        ],
+        "first_gold_rank": 0,
+        "recall": 0.0,
+        "hit_k": 0.0,
+        "hit_1": 0.0,
+        "rr": 0.0,
+        "ndcg": 0.0,
+        "latency_ms": 5059.3
+      },
+      {
+        "qid": "q26",
+        "category": "sse",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_7ac56eda24aa_12",
+          "doc_aafdf4f95df5_15",
+          "doc_31546f0ed884_21",
+          "doc_31546f0ed884_12"
+        ],
+        "gold": [
+          "doc_31546f0ed884_21",
+          "doc_7ac56eda24aa_12"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.9197,
+        "latency_ms": 5033.6
+      },
+      {
+        "qid": "q27",
+        "category": "deploy",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_2581a693efa8_21",
+          "doc_7ac56eda24aa_13",
+          "doc_7ac56eda24aa_14",
+          "doc_31546f0ed884_7"
+        ],
+        "gold": [
+          "doc_2581a693efa8_20",
+          "doc_2581a693efa8_21",
+          "doc_7ac56eda24aa_13",
+          "doc_7ac56eda24aa_18"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6367,
+        "latency_ms": 5173.6
+      },
+      {
+        "qid": "q28",
+        "category": "deploy",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_16",
+          "doc_2581a693efa8_22",
+          "doc_31546f0ed884_7",
+          "doc_2581a693efa8_14"
+        ],
+        "gold": [
+          "doc_2581a693efa8_22"
+        ],
+        "first_gold_rank": 2,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 0.0,
+        "rr": 0.5,
+        "ndcg": 0.6309,
+        "latency_ms": 5051.7
+      },
+      {
+        "qid": "q29",
+        "category": "deploy",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_2581a693efa8_21",
+          "doc_2581a693efa8_20",
+          "doc_7ac56eda24aa_13",
+          "doc_2581a693efa8_19"
+        ],
+        "gold": [
+          "doc_2581a693efa8_20",
+          "doc_2581a693efa8_21"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 4995.7
+      },
+      {
+        "qid": "q30",
+        "category": "test",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_aafdf4f95df5_6",
+          "doc_aafdf4f95df5_5",
+          "doc_aafdf4f95df5_4",
+          "doc_aafdf4f95df5_3"
+        ],
+        "gold": [
+          "doc_aafdf4f95df5_5",
+          "doc_aafdf4f95df5_6"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 5058.4
+      },
+      {
+        "qid": "q31",
+        "category": "test",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_aafdf4f95df5_19",
+          "doc_2581a693efa8_13",
+          "doc_3bd596615556_1",
+          "doc_31546f0ed884_11"
+        ],
+        "gold": [
+          "doc_aafdf4f95df5_18",
+          "doc_aafdf4f95df5_19"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 4986.2
+      },
+      {
+        "qid": "q32",
+        "category": "test",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_3",
+          "doc_3bd596615556_15",
+          "doc_3bd596615556_12",
+          "doc_3bd596615556_5"
+        ],
+        "gold": [
+          "doc_aafdf4f95df5_22",
+          "doc_aafdf4f95df5_23"
+        ],
+        "first_gold_rank": 0,
+        "recall": 0.0,
+        "hit_k": 0.0,
+        "hit_1": 0.0,
+        "rr": 0.0,
+        "ndcg": 0.0,
+        "latency_ms": 4961.3
+      },
+      {
+        "qid": "q33",
+        "category": "test",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_3bd596615556_9",
+          "doc_aafdf4f95df5_27",
+          "doc_31546f0ed884_31",
+          "doc_3bd596615556_27"
+        ],
+        "gold": [
+          "doc_aafdf4f95df5_26",
+          "doc_aafdf4f95df5_27"
+        ],
+        "first_gold_rank": 2,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 0.0,
+        "rr": 0.5,
+        "ndcg": 0.3869,
+        "latency_ms": 5017.2
+      },
+      {
+        "qid": "q34",
+        "category": "observability",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_26",
+          "doc_2581a693efa8_21",
+          "doc_2a0b98c7bafb_24",
+          "doc_3bd596615556_26"
+        ],
+        "gold": [
+          "doc_2581a693efa8_25",
+          "doc_2581a693efa8_26"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 4967.5
+      },
+      {
+        "qid": "q35",
+        "category": "reliability",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_18",
+          "doc_2581a693efa8_19",
+          "doc_31546f0ed884_35",
+          "doc_2581a693efa8_5"
+        ],
+        "gold": [
+          "doc_2581a693efa8_19"
+        ],
+        "first_gold_rank": 2,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 0.0,
+        "rr": 0.5,
+        "ndcg": 0.6309,
+        "latency_ms": 5040.7
+      },
+      {
+        "qid": "q36",
+        "category": "reliability",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_18",
+          "doc_31546f0ed884_34",
+          "doc_aafdf4f95df5_16",
+          "doc_31546f0ed884_35"
+        ],
+        "gold": [
+          "doc_2581a693efa8_17",
+          "doc_2581a693efa8_18"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 4999.4
+      },
+      {
+        "qid": "q37",
+        "category": "scale",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_2581a693efa8_24",
+          "doc_7ac56eda24aa_1",
+          "doc_2581a693efa8_27",
+          "doc_2a0b98c7bafb_18"
+        ],
+        "gold": [
+          "doc_2581a693efa8_23",
+          "doc_2581a693efa8_24"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 5073.2
+      },
+      {
+        "qid": "q38",
+        "category": "scale",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_16",
+          "doc_2581a693efa8_14",
+          "doc_2a0b98c7bafb_24",
+          "doc_3bd596615556_11"
+        ],
+        "gold": [
+          "doc_2581a693efa8_16",
+          "doc_2581a693efa8_25"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 5097.5
+      },
+      {
+        "qid": "q39",
+        "category": "evaluation",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_2581a693efa8_30",
+          "doc_2581a693efa8_29",
+          "doc_7ac56eda24aa_0",
+          "doc_2a0b98c7bafb_23"
+        ],
+        "gold": [
+          "doc_2581a693efa8_29",
+          "doc_2581a693efa8_30"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 5111.2
+      },
+      {
+        "qid": "q40",
+        "category": "documentation",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_3bd596615556_28",
+          "doc_2a0b98c7bafb_20",
+          "doc_3bd596615556_21",
+          "doc_3bd596615556_29"
+        ],
+        "gold": [
+          "doc_3bd596615556_21",
+          "doc_3bd596615556_28",
+          "doc_2a0b98c7bafb_20",
+          "doc_7ac56eda24aa_17"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.75,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.8319,
+        "latency_ms": 5086.9
+      },
+      {
+        "qid": "q41",
+        "category": "sources",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_28",
+          "doc_3bd596615556_25",
+          "doc_aafdf4f95df5_22",
+          "doc_aafdf4f95df5_21"
+        ],
+        "gold": [
+          "doc_2581a693efa8_27",
+          "doc_2581a693efa8_28"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 5044.6
+      },
+      {
+        "qid": "q42",
+        "category": "documentation",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_7ac56eda24aa_18",
+          "doc_aafdf4f95df5_4",
+          "doc_aafdf4f95df5_5",
+          "doc_31546f0ed884_32"
+        ],
+        "gold": [
+          "doc_7ac56eda24aa_17",
+          "doc_7ac56eda24aa_18"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 5070.4
+      },
+      {
+        "qid": "q43",
+        "category": "multitenancy",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_25",
+          "doc_7ac56eda24aa_18",
+          "doc_2a0b98c7bafb_25",
+          "doc_2581a693efa8_1"
+        ],
+        "gold": [
+          "doc_2581a693efa8_24",
+          "doc_2581a693efa8_25"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 5053.3
+      },
+      {
+        "qid": "q44",
+        "category": "retrieval",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_2581a693efa8_1",
+          "doc_2a0b98c7bafb_21",
+          "doc_2581a693efa8_23",
+          "doc_7ac56eda24aa_5"
+        ],
+        "gold": [
+          "doc_2581a693efa8_1"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 5301.2
+      },
+      {
+        "qid": "q45",
+        "category": "api",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_aafdf4f95df5_19",
+          "doc_2581a693efa8_8",
+          "doc_2581a693efa8_22",
+          "doc_2581a693efa8_3"
+        ],
+        "gold": [
+          "doc_31546f0ed884_37",
+          "doc_31546f0ed884_38",
+          "doc_aafdf4f95df5_19"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.3333,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.4693,
+        "latency_ms": 5203.0
+      },
+      {
+        "qid": "q46",
+        "category": "rag",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_2581a693efa8_27",
+          "doc_31546f0ed884_8",
+          "doc_31546f0ed884_32",
+          "doc_3bd596615556_26"
+        ],
+        "gold": [
+          "doc_2581a693efa8_26",
+          "doc_2581a693efa8_27",
+          "doc_2a0b98c7bafb_25"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.3333,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.4693,
+        "latency_ms": 5101.6
+      }
+    ],
+    "E": [
+      {
+        "qid": "q01",
+        "category": "rag",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_31546f0ed884_16",
+          "doc_7ac56eda24aa_8",
+          "doc_2581a693efa8_27",
+          "doc_2581a693efa8_4"
+        ],
+        "gold": [
+          "doc_7ac56eda24aa_7",
+          "doc_7ac56eda24aa_8"
+        ],
+        "first_gold_rank": 2,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 0.0,
+        "rr": 0.5,
+        "ndcg": 0.3869,
+        "latency_ms": 5876.5
+      },
+      {
+        "qid": "q02",
+        "category": "retrieval",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_2",
+          "doc_2581a693efa8_3",
+          "doc_2a0b98c7bafb_23",
+          "doc_31546f0ed884_29"
+        ],
+        "gold": [
+          "doc_2581a693efa8_1",
+          "doc_2581a693efa8_2"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 5161.2
+      },
+      {
+        "qid": "q03",
+        "category": "retrieval",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_3bd596615556_5",
+          "doc_2581a693efa8_3",
+          "doc_2581a693efa8_23",
+          "doc_2a0b98c7bafb_19"
+        ],
+        "gold": [
+          "doc_2581a693efa8_2",
+          "doc_2581a693efa8_3"
+        ],
+        "first_gold_rank": 2,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 0.0,
+        "rr": 0.5,
+        "ndcg": 0.3869,
+        "latency_ms": 5145.4
+      },
+      {
+        "qid": "q04",
+        "category": "retrieval",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_23",
+          "doc_2581a693efa8_3",
+          "doc_2581a693efa8_29",
+          "doc_2581a693efa8_2"
+        ],
+        "gold": [
+          "doc_2581a693efa8_22",
+          "doc_2581a693efa8_23"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 5068.2
+      },
+      {
+        "qid": "q05",
+        "category": "retrieval",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_2a0b98c7bafb_25",
+          "doc_2581a693efa8_22",
+          "doc_2a0b98c7bafb_23",
+          "doc_2581a693efa8_2"
+        ],
+        "gold": [
+          "doc_2581a693efa8_22",
+          "doc_2a0b98c7bafb_25"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 4981.8
+      },
+      {
+        "qid": "q06",
+        "category": "chunking",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_4",
+          "doc_2581a693efa8_3",
+          "doc_3bd596615556_29",
+          "doc_31546f0ed884_8"
+        ],
+        "gold": [
+          "doc_2581a693efa8_3",
+          "doc_2581a693efa8_4"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 4993.2
+      },
+      {
+        "qid": "q07",
+        "category": "chunking",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_2581a693efa8_4",
+          "doc_2581a693efa8_3",
+          "doc_3bd596615556_29",
+          "doc_2581a693efa8_23"
+        ],
+        "gold": [
+          "doc_2581a693efa8_3",
+          "doc_2581a693efa8_4"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 4969.1
+      },
+      {
+        "qid": "q08",
+        "category": "architecture",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_31546f0ed884_2",
+          "doc_2a0b98c7bafb_5",
+          "doc_2a0b98c7bafb_1",
+          "doc_31546f0ed884_32"
+        ],
+        "gold": [
+          "doc_31546f0ed884_1",
+          "doc_31546f0ed884_2"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 5051.6
+      },
+      {
+        "qid": "q09",
+        "category": "architecture",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_2581a693efa8_16",
+          "doc_2581a693efa8_18",
+          "doc_2a0b98c7bafb_20",
+          "doc_2581a693efa8_15"
+        ],
+        "gold": [
+          "doc_31546f0ed884_7"
+        ],
+        "first_gold_rank": 0,
+        "recall": 0.0,
+        "hit_k": 0.0,
+        "hit_1": 0.0,
+        "rr": 0.0,
+        "ndcg": 0.0,
+        "latency_ms": 4961.4
+      },
+      {
+        "qid": "q10",
+        "category": "architecture",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_2581a693efa8_15",
+          "doc_3bd596615556_10",
+          "doc_3bd596615556_9",
+          "doc_3bd596615556_8"
+        ],
+        "gold": [
+          "doc_3bd596615556_9",
+          "doc_3bd596615556_10"
+        ],
+        "first_gold_rank": 2,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 0.0,
+        "rr": 0.5,
+        "ndcg": 0.6934,
+        "latency_ms": 4975.7
+      },
+      {
+        "qid": "q11",
+        "category": "architecture",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_31546f0ed884_7",
+          "doc_2a0b98c7bafb_20",
+          "doc_2581a693efa8_16",
+          "doc_2a0b98c7bafb_9"
+        ],
+        "gold": [
+          "doc_31546f0ed884_7"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 4846.0
+      },
+      {
+        "qid": "q12",
+        "category": "database",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_31546f0ed884_25",
+          "doc_aafdf4f95df5_7",
+          "doc_7ac56eda24aa_15",
+          "doc_2581a693efa8_10"
+        ],
+        "gold": [
+          "doc_31546f0ed884_25",
+          "doc_2581a693efa8_10",
+          "doc_2a0b98c7bafb_16"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.6667,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6714,
+        "latency_ms": 4922.0
+      },
+      {
+        "qid": "q13",
+        "category": "database",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_11",
+          "doc_2a0b98c7bafb_24",
+          "doc_2a0b98c7bafb_1",
+          "doc_2581a693efa8_14"
+        ],
+        "gold": [
+          "doc_2581a693efa8_10",
+          "doc_2581a693efa8_11"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 5043.2
+      },
+      {
+        "qid": "q14",
+        "category": "database",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_3bd596615556_22",
+          "doc_2581a693efa8_19",
+          "doc_3bd596615556_24",
+          "doc_2a0b98c7bafb_1"
+        ],
+        "gold": [
+          "doc_3bd596615556_21",
+          "doc_3bd596615556_22",
+          "doc_3bd596615556_23",
+          "doc_2581a693efa8_19"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6367,
+        "latency_ms": 4930.2
+      },
+      {
+        "qid": "q15",
+        "category": "database",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_3bd596615556_22",
+          "doc_2581a693efa8_19",
+          "doc_3bd596615556_24",
+          "doc_2581a693efa8_20"
+        ],
+        "gold": [
+          "doc_3bd596615556_22",
+          "doc_3bd596615556_23",
+          "doc_3bd596615556_28",
+          "doc_2581a693efa8_19",
+          "doc_2581a693efa8_20"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.6,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.8048,
+        "latency_ms": 4936.2
+      },
+      {
+        "qid": "q16",
+        "category": "database",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_2581a693efa8_19",
+          "doc_2581a693efa8_20",
+          "doc_3bd596615556_22",
+          "doc_3bd596615556_24"
+        ],
+        "gold": [
+          "doc_2581a693efa8_20"
+        ],
+        "first_gold_rank": 2,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 0.0,
+        "rr": 0.5,
+        "ndcg": 0.6309,
+        "latency_ms": 4997.6
+      },
+      {
+        "qid": "q17",
+        "category": "api",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_31546f0ed884_8",
+          "doc_31546f0ed884_32",
+          "doc_aafdf4f95df5_4",
+          "doc_aafdf4f95df5_3"
+        ],
+        "gold": [
+          "doc_31546f0ed884_8"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 4956.3
+      },
+      {
+        "qid": "q18",
+        "category": "api",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_31546f0ed884_9",
+          "doc_2a0b98c7bafb_2",
+          "doc_aafdf4f95df5_10",
+          "doc_2581a693efa8_28"
+        ],
+        "gold": [
+          "doc_31546f0ed884_9"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 4955.6
+      },
+      {
+        "qid": "q19",
+        "category": "api",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_31546f0ed884_31",
+          "doc_aafdf4f95df5_3",
+          "doc_aafdf4f95df5_9",
+          "doc_aafdf4f95df5_6"
+        ],
+        "gold": [
+          "doc_7ac56eda24aa_15"
+        ],
+        "first_gold_rank": 0,
+        "recall": 0.0,
+        "hit_k": 0.0,
+        "hit_1": 0.0,
+        "rr": 0.0,
+        "ndcg": 0.0,
+        "latency_ms": 4935.5
+      },
+      {
+        "qid": "q20",
+        "category": "api",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_31546f0ed884_31",
+          "doc_3bd596615556_8",
+          "doc_3bd596615556_9",
+          "doc_3bd596615556_27"
+        ],
+        "gold": [
+          "doc_31546f0ed884_31"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 5041.9
+      },
+      {
+        "qid": "q21",
+        "category": "agent",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_5",
+          "doc_2581a693efa8_6",
+          "doc_7ac56eda24aa_9",
+          "doc_3bd596615556_17"
+        ],
+        "gold": [
+          "doc_2581a693efa8_5",
+          "doc_2581a693efa8_6",
+          "doc_2a0b98c7bafb_23"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.6667,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.7654,
+        "latency_ms": 4925.5
+      },
+      {
+        "qid": "q22",
+        "category": "agent",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_2581a693efa8_9",
+          "doc_aafdf4f95df5_18",
+          "doc_2581a693efa8_6",
+          "doc_31546f0ed884_34"
+        ],
+        "gold": [
+          "doc_2581a693efa8_8",
+          "doc_2581a693efa8_9",
+          "doc_2a0b98c7bafb_23"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.3333,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.4693,
+        "latency_ms": 5020.7
+      },
+      {
+        "qid": "q23",
+        "category": "agent",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_7ac56eda24aa_9",
+          "doc_31546f0ed884_10",
+          "doc_2581a693efa8_13",
+          "doc_2a0b98c7bafb_22"
+        ],
+        "gold": [
+          "doc_7ac56eda24aa_9"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 4951.5
+      },
+      {
+        "qid": "q24",
+        "category": "agent",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_2581a693efa8_13",
+          "doc_3bd596615556_4",
+          "doc_3bd596615556_1",
+          "doc_3bd596615556_3"
+        ],
+        "gold": [
+          "doc_2581a693efa8_12",
+          "doc_2581a693efa8_13"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 4975.1
+      },
+      {
+        "qid": "q25",
+        "category": "sse",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_31546f0ed884_34",
+          "doc_7ac56eda24aa_0",
+          "doc_aafdf4f95df5_15",
+          "doc_7ac56eda24aa_17"
+        ],
+        "gold": [
+          "doc_7ac56eda24aa_2"
+        ],
+        "first_gold_rank": 0,
+        "recall": 0.0,
+        "hit_k": 0.0,
+        "hit_1": 0.0,
+        "rr": 0.0,
+        "ndcg": 0.0,
+        "latency_ms": 4951.9
+      },
+      {
+        "qid": "q26",
+        "category": "sse",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_7ac56eda24aa_12",
+          "doc_31546f0ed884_21",
+          "doc_aafdf4f95df5_15",
+          "doc_7ac56eda24aa_11"
+        ],
+        "gold": [
+          "doc_31546f0ed884_21",
+          "doc_7ac56eda24aa_12"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 4934.4
+      },
+      {
+        "qid": "q27",
+        "category": "deploy",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_2581a693efa8_21",
+          "doc_7ac56eda24aa_13",
+          "doc_7ac56eda24aa_14",
+          "doc_3bd596615556_27"
+        ],
+        "gold": [
+          "doc_2581a693efa8_20",
+          "doc_2581a693efa8_21",
+          "doc_7ac56eda24aa_13",
+          "doc_7ac56eda24aa_18"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6367,
+        "latency_ms": 4976.4
+      },
+      {
+        "qid": "q28",
+        "category": "deploy",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_16",
+          "doc_2581a693efa8_21",
+          "doc_2581a693efa8_22",
+          "doc_31546f0ed884_7"
+        ],
+        "gold": [
+          "doc_2581a693efa8_22"
+        ],
+        "first_gold_rank": 3,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 0.0,
+        "rr": 0.3333,
+        "ndcg": 0.5,
+        "latency_ms": 4970.5
+      },
+      {
+        "qid": "q29",
+        "category": "deploy",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_2581a693efa8_21",
+          "doc_2581a693efa8_20",
+          "doc_7ac56eda24aa_13",
+          "doc_2581a693efa8_19"
+        ],
+        "gold": [
+          "doc_2581a693efa8_20",
+          "doc_2581a693efa8_21"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 4942.7
+      },
+      {
+        "qid": "q30",
+        "category": "test",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_aafdf4f95df5_6",
+          "doc_aafdf4f95df5_5",
+          "doc_aafdf4f95df5_4",
+          "doc_aafdf4f95df5_22"
+        ],
+        "gold": [
+          "doc_aafdf4f95df5_5",
+          "doc_aafdf4f95df5_6"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 4950.8
+      },
+      {
+        "qid": "q31",
+        "category": "test",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_aafdf4f95df5_19",
+          "doc_2581a693efa8_13",
+          "doc_3bd596615556_20",
+          "doc_31546f0ed884_11"
+        ],
+        "gold": [
+          "doc_aafdf4f95df5_18",
+          "doc_aafdf4f95df5_19"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 5021.7
+      },
+      {
+        "qid": "q32",
+        "category": "test",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_3",
+          "doc_3bd596615556_15",
+          "doc_3bd596615556_12",
+          "doc_3bd596615556_5"
+        ],
+        "gold": [
+          "doc_aafdf4f95df5_22",
+          "doc_aafdf4f95df5_23"
+        ],
+        "first_gold_rank": 0,
+        "recall": 0.0,
+        "hit_k": 0.0,
+        "hit_1": 0.0,
+        "rr": 0.0,
+        "ndcg": 0.0,
+        "latency_ms": 4937.7
+      },
+      {
+        "qid": "q33",
+        "category": "test",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_aafdf4f95df5_27",
+          "doc_3bd596615556_9",
+          "doc_3bd596615556_27",
+          "doc_31546f0ed884_31"
+        ],
+        "gold": [
+          "doc_aafdf4f95df5_26",
+          "doc_aafdf4f95df5_27"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 4949.5
+      },
+      {
+        "qid": "q34",
+        "category": "observability",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_26",
+          "doc_2581a693efa8_21",
+          "doc_2581a693efa8_14",
+          "doc_2a0b98c7bafb_24"
+        ],
+        "gold": [
+          "doc_2581a693efa8_25",
+          "doc_2581a693efa8_26"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 4967.5
+      },
+      {
+        "qid": "q35",
+        "category": "reliability",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_18",
+          "doc_31546f0ed884_35",
+          "doc_2581a693efa8_19",
+          "doc_2a0b98c7bafb_24"
+        ],
+        "gold": [
+          "doc_2581a693efa8_19"
+        ],
+        "first_gold_rank": 3,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 0.0,
+        "rr": 0.3333,
+        "ndcg": 0.5,
+        "latency_ms": 5007.5
+      },
+      {
+        "qid": "q36",
+        "category": "reliability",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_18",
+          "doc_31546f0ed884_34",
+          "doc_2581a693efa8_16",
+          "doc_aafdf4f95df5_16"
+        ],
+        "gold": [
+          "doc_2581a693efa8_17",
+          "doc_2581a693efa8_18"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 4892.8
+      },
+      {
+        "qid": "q37",
+        "category": "scale",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_2581a693efa8_24",
+          "doc_2a0b98c7bafb_25",
+          "doc_2581a693efa8_27",
+          "doc_2581a693efa8_10"
+        ],
+        "gold": [
+          "doc_2581a693efa8_23",
+          "doc_2581a693efa8_24"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 4946.6
+      },
+      {
+        "qid": "q38",
+        "category": "scale",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_16",
+          "doc_2581a693efa8_14",
+          "doc_2a0b98c7bafb_24",
+          "doc_2581a693efa8_15"
+        ],
+        "gold": [
+          "doc_2581a693efa8_16",
+          "doc_2581a693efa8_25"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 4979.2
+      },
+      {
+        "qid": "q39",
+        "category": "evaluation",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_2581a693efa8_30",
+          "doc_2581a693efa8_29",
+          "doc_7ac56eda24aa_0",
+          "doc_7ac56eda24aa_17"
+        ],
+        "gold": [
+          "doc_2581a693efa8_29",
+          "doc_2581a693efa8_30"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 4993.9
+      },
+      {
+        "qid": "q40",
+        "category": "documentation",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_3bd596615556_28",
+          "doc_2a0b98c7bafb_20",
+          "doc_3bd596615556_21",
+          "doc_31546f0ed884_4"
+        ],
+        "gold": [
+          "doc_3bd596615556_21",
+          "doc_3bd596615556_28",
+          "doc_2a0b98c7bafb_20",
+          "doc_7ac56eda24aa_17"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.75,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.8319,
+        "latency_ms": 4970.4
+      },
+      {
+        "qid": "q41",
+        "category": "sources",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_28",
+          "doc_aafdf4f95df5_21",
+          "doc_aafdf4f95df5_22",
+          "doc_3bd596615556_25"
+        ],
+        "gold": [
+          "doc_2581a693efa8_27",
+          "doc_2581a693efa8_28"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 4966.6
+      },
+      {
+        "qid": "q42",
+        "category": "documentation",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_7ac56eda24aa_18",
+          "doc_aafdf4f95df5_4",
+          "doc_aafdf4f95df5_3",
+          "doc_7ac56eda24aa_1"
+        ],
+        "gold": [
+          "doc_7ac56eda24aa_17",
+          "doc_7ac56eda24aa_18"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 4960.1
+      },
+      {
+        "qid": "q43",
+        "category": "multitenancy",
+        "difficulty": "medium",
+        "ranked": [
+          "doc_2581a693efa8_25",
+          "doc_7ac56eda24aa_18",
+          "doc_2a0b98c7bafb_25",
+          "doc_2581a693efa8_1"
+        ],
+        "gold": [
+          "doc_2581a693efa8_24",
+          "doc_2581a693efa8_25"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.5,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.6131,
+        "latency_ms": 4971.3
+      },
+      {
+        "qid": "q44",
+        "category": "retrieval",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_2581a693efa8_1",
+          "doc_2a0b98c7bafb_21",
+          "doc_2581a693efa8_23",
+          "doc_7ac56eda24aa_5"
+        ],
+        "gold": [
+          "doc_2581a693efa8_1"
+        ],
+        "first_gold_rank": 1,
+        "recall": 1.0,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 1.0,
+        "latency_ms": 4937.0
+      },
+      {
+        "qid": "q45",
+        "category": "api",
+        "difficulty": "easy",
+        "ranked": [
+          "doc_aafdf4f95df5_19",
+          "doc_31546f0ed884_1",
+          "doc_2581a693efa8_8",
+          "doc_2a0b98c7bafb_19"
+        ],
+        "gold": [
+          "doc_31546f0ed884_37",
+          "doc_31546f0ed884_38",
+          "doc_aafdf4f95df5_19"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.3333,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.4693,
+        "latency_ms": 4948.3
+      },
+      {
+        "qid": "q46",
+        "category": "rag",
+        "difficulty": "hard",
+        "ranked": [
+          "doc_2581a693efa8_27",
+          "doc_3bd596615556_4",
+          "doc_3bd596615556_26",
+          "doc_31546f0ed884_32"
+        ],
+        "gold": [
+          "doc_2581a693efa8_26",
+          "doc_2581a693efa8_27",
+          "doc_2a0b98c7bafb_25"
+        ],
+        "first_gold_rank": 1,
+        "recall": 0.3333,
+        "hit_k": 1.0,
+        "hit_1": 1.0,
+        "rr": 1.0,
+        "ndcg": 0.4693,
+        "latency_ms": 4992.4
+      }
+    ]
+  }
+}

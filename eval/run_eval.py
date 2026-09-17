@@ -58,9 +58,10 @@ CONFIGS: dict[str, dict] = {
 }
 
 
-def load_dataset() -> list[dict]:
+def load_dataset(path: str | None = None) -> list[dict]:
+    source = EVAL_DIR / path if path else DATASET
     rows = []
-    for line in DATASET.read_text(encoding="utf-8").splitlines():
+    for line in source.read_text(encoding="utf-8").splitlines():
         line = line.strip()
         if line:
             rows.append(json.loads(line))
@@ -128,8 +129,8 @@ def score(ranked: list[str], gold: set[str], k: int) -> dict:
 
 
 def main(only: list[str] | None = None, validate_only: bool = False,
-         out_name: str = "metrics.json") -> int:
-    rows = load_dataset()
+         out_name: str = "metrics.json", dataset_path: str | None = None) -> int:
+    rows = load_dataset(dataset_path)
     store = VectorStoreService()
     reranker = RerankerService()
     chunks = load_chunks(store)
@@ -279,9 +280,15 @@ if __name__ == "__main__":
         help="结果文件名，写入 eval/results/。分批跑（如 --only A,B,D 与 "
              "--only C,E 分开）时用它避免互相覆盖",
     )
+    parser.add_argument(
+        "--dataset", default=None,
+        help="标注文件名（相对 eval/），默认 dataset.jsonl。用于做同口径对照，"
+             "例如用旧版标注集对比精排参数改动带来的精度变化",
+    )
     args = parser.parse_args()
     sys.exit(main(
         only=[s.strip() for s in args.only.split(",") if s.strip()] or None,
         validate_only=args.validate_only,
         out_name=args.out,
+        dataset_path=args.dataset,
     ))

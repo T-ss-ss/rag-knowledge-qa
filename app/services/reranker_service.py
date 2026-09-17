@@ -49,6 +49,30 @@ class RerankerService:
         self._model_name = settings.reranker_model
         # CPU 推理，同一模型实例不应被并发调用
         self._invoke_lock = threading.Lock()
+        # 量化后的实际生效标记，用于日志与排查
+        self.quantized = False
+
+    def _quantize(self) -> None:
+        """对 Linear 层做动态 int8 量化。
+
+        纯 CPU 是精排唯一的瓶颈（568M 参数、fp32、12 条候选要过一遍）。
+        实测把 Linear 换成 int8 可提速约 1.86x，而分数最大漂移 < 0.001
+        （见 eval/README.md 的性能表），对排序结果无可见影响。
+
+        注意：torch.ao.quantization 在 torch 2.10 起废弃，未来需迁移到
+        torchao；此处用 try/except 包住，量化失败时静默回退 fp32，
+        绝不能因为一个性能优化把精排功能弄挂。
+        """
+        try:
+            import torch
+
+            self._model.model = torch.quantization.quantize_dynamic(
+                self._model.model, {torch.nn.Linear}, dtype=torch.qint8
+            )
+            self.quantized = True
+            logger.info("Reranker 已启用动态 int8 量化")
+        except Exception as e:
+            logger.warning("Reranker 量化失败，回退到 fp32：%s", e)
 
     def _load_model(self):
         if self._model is not None:
@@ -71,7 +95,12 @@ class RerankerService:
                 kwargs["cache_dir"] = str(cache_dir)
 
             self._model = FlagReranker(model_path, **kwargs)
-            logger.info("Reranker model '%s' loaded.", self._model_name)
+            if settings.rerank_quantize:
+                self._quantize()
+            logger.info(
+                "Reranker model '%s' loaded (max_length=%d, quantized=%s).",
+                self._model_name, settings.rerank_max_length, self.quantized,
+            )
             return True
         except Exception as e:
             logger.warning("Failed to load reranker model '%s': %s", self._model_name, e)
@@ -97,7 +126,11 @@ class RerankerService:
         pairs = [[question, doc] for doc in documents]
         try:
             with self._invoke_lock:
-                scores = self._model.compute_score(pairs, normalize=True)
+                # max_length 是可调的性能旋钮：chunk 约 1000 字符（中文 ≈ 700 token），
+                # 截到 256 会牺牲尾部文本，但也把注意力计算量降下来。
+                scores = self._model.compute_score(
+                    pairs, normalize=True, max_length=settings.rerank_max_length
+                )
         except Exception as e:
             logger.warning("Rerank failed: %s, falling back to original order.", e)
             return documents[:top_k], metadatas[:top_k]

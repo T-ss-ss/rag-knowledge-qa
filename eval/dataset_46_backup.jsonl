@@ -1,0 +1,46 @@
+{"qid": "q01", "question": "检索到的文档片段最后是怎么拼成给 LLM 的上下文的？", "evidence": "4. 格式化 Context", "category": "rag", "difficulty": "easy"}
+{"qid": "q02", "question": "为什么用余弦相似度做向量距离度量，而不是欧氏距离？", "evidence": "使用余弦相似度而非欧氏距离", "category": "retrieval", "difficulty": "medium"}
+{"qid": "q03", "question": "项目用的精排模型是什么，首次使用会下载多大权重？", "evidence": "首次调用才下载约 2.1 GB 权重", "category": "retrieval", "difficulty": "easy"}
+{"qid": "q04", "question": "为什么检索要拆成召回和精排两个阶段？", "evidence": "召回→精排", "category": "retrieval", "difficulty": "medium"}
+{"qid": "q05", "question": "Cross-encoder 为什么不能直接拿来对全库做检索？", "evidence": "BGE-Reranker 是 Cross-encoder", "category": "retrieval", "difficulty": "hard"}
+{"qid": "q06", "question": "为什么把 chunk_size 定成 1000 字符？", "evidence": "1000 字符 ≈ 300-500 中文词", "category": "chunking", "difficulty": "medium"}
+{"qid": "q07", "question": "切块时保留 200 字符重叠是为了防止什么？", "evidence": "防止关键句刚好落在切分边界被截断", "category": "chunking", "difficulty": "easy"}
+{"qid": "q08", "question": "项目里一共定义了多少个 Pydantic 请求/响应模型？", "evidence": "23 个 Pydantic 请求/响应模型", "category": "architecture", "difficulty": "easy"}
+{"qid": "q09", "question": "代码分层的调用方向是怎样的？", "evidence": "Router → Service → Repository → Database（调用链）", "category": "architecture", "difficulty": "easy"}
+{"qid": "q10", "question": "同步阻塞的代码为什么不能写成 async def？", "evidence": "Starlette 会自动把它丢进线程池执行", "category": "architecture", "difficulty": "hard"}
+{"qid": "q11", "question": "分层依赖规则里，Router 能不能直接访问 Repository？", "evidence": "Router 不直接访问 Repository", "category": "architecture", "difficulty": "medium"}
+{"qid": "q12", "question": "删除知识库时，它下面的文档和会话会怎样？", "evidence": "CASCADE DELETE", "category": "database", "difficulty": "easy"}
+{"qid": "q13", "question": "为什么要给 SQLite 开启 WAL 模式？", "evidence": "WAL (Write-Ahead Logging) 的核心思想", "category": "database", "difficulty": "medium"}
+{"qid": "q14", "question": "Schema 迁移过程中要是进程被中断，最坏会怎样？", "evidence": "DROP TABLE messages", "category": "database", "difficulty": "hard"}
+{"qid": "q15", "question": "怎么保证整段 Schema 迁移脚本的原子性？", "evidence": "BEGIN IMMEDIATE", "category": "database", "difficulty": "medium"}
+{"qid": "q16", "question": "迁移会不会丢数据，依据是什么？", "evidence": "全量复制后再删旧表", "category": "database", "difficulty": "hard"}
+{"qid": "q17", "question": "上传文档用的是哪个接口、什么内容类型？", "evidence": "POST /api/upload (multipart/form-data)", "category": "api", "difficulty": "easy"}
+{"qid": "q18", "question": "无状态问答接口在检索前会做哪两项校验？", "evidence": "validate KB exists, collection not empty", "category": "api", "difficulty": "medium"}
+{"qid": "q19", "question": "怎么查某个知识库下的文档列表？", "evidence": "GET    /api/documents?kb_id=default  # 文档列表", "category": "api", "difficulty": "easy"}
+{"qid": "q20", "question": "健康检查接口在端点总览表里是怎么描述的？", "evidence": "GET | `/health` | 健康检查", "category": "api", "difficulty": "easy"}
+{"qid": "q21", "question": "Agent 的 ReAct 循环在什么条件下终止？", "evidence": "循环终止条件", "category": "agent", "difficulty": "medium"}
+{"qid": "q22", "question": "Tool Calling 的参数 JSON 解析失败时会怎么兜底？", "evidence": "如果 Tool Calling 的 JSON 参数解析失败", "category": "agent", "difficulty": "hard"}
+{"qid": "q23", "question": "多轮对话模式下会额外注入多少条历史消息？", "evidence": "最近 20 条历史消息", "category": "agent", "difficulty": "easy"}
+{"qid": "q24", "question": "同一个会话里第二次提问为什么曾经会返回 400？", "evidence": "导致同一会话第二轮提问时 API 400", "category": "agent", "difficulty": "hard"}
+{"qid": "q25", "question": "流式回答走的是什么传输机制？", "evidence": "REST API + SSE Streaming", "category": "sse", "difficulty": "easy"}
+{"qid": "q26", "question": "SSE 一共会推送哪些事件类型？", "evidence": "SSE 事件流", "category": "sse", "difficulty": "medium"}
+{"qid": "q27", "question": "用容器启动整套服务的最短命令是什么？", "evidence": "docker compose up -d", "category": "deploy", "difficulty": "easy"}
+{"qid": "q28", "question": "Nginx 反向代理要把请求转发到哪个上游地址？", "evidence": "proxy_pass http://app:8080", "category": "deploy", "difficulty": "medium"}
+{"qid": "q29", "question": "容器化部署一共挂了几个持久化卷，删容器会丢数据吗？", "evidence": "3 个持久化卷", "category": "deploy", "difficulty": "hard"}
+{"qid": "q30", "question": "同一个文件重复上传，是预期行为还是缺陷？", "evidence": "同一文件重复上传", "category": "test", "difficulty": "easy"}
+{"qid": "q31", "question": "流式提问中途客户端断了，助手消息还会入库吗？", "evidence": "客户端断开连接", "category": "test", "difficulty": "hard"}
+{"qid": "q32", "question": "怎么在不改全局配置的情况下，让单次请求跳过精排？", "evidence": "Rerank 开关（接口级关闭）", "category": "test", "difficulty": "medium"}
+{"qid": "q33", "question": "API Key 填错时启动，健康检查会返回什么状态？", "evidence": "使用无效 API Key 启动", "category": "test", "difficulty": "medium"}
+{"qid": "q34", "question": "生产环境的日志方案现在差距在哪？", "evidence": "提前引入结构化日志", "category": "observability", "difficulty": "medium"}
+{"qid": "q35", "question": "LLM 连续失败时，除了重试还能上什么保护？", "evidence": "指数退避重试（Exponential Backoff）", "category": "reliability", "difficulty": "medium"}
+{"qid": "q36", "question": "LLM 调用失败是怎么分层的？", "evidence": "分层异常处理", "category": "reliability", "difficulty": "medium"}
+{"qid": "q37", "question": "10 万篇文档的规模下，ChromaDB 大概要扛多少向量？", "evidence": "500 万向量", "category": "scale", "difficulty": "hard"}
+{"qid": "q38", "question": "要支撑更高并发，第一优先应该换掉哪个组件？", "evidence": "SQLite → PostgreSQL", "category": "scale", "difficulty": "medium"}
+{"qid": "q39", "question": "文档里提到用哪个框架做 RAG 自动化评估？", "evidence": "RAGAS 框架", "category": "evaluation", "difficulty": "easy"}
+{"qid": "q40", "question": "项目文档当前声称有多少个直接依赖？", "evidence": "13 个直接依赖", "category": "documentation", "difficulty": "medium"}
+{"qid": "q41", "question": "来源里的 page 字段等于 0 代表什么？", "evidence": "page == 0", "category": "sources", "difficulty": "medium"}
+{"qid": "q42", "question": "后续规划里 v0.5 打算支持哪些新的文档格式？", "evidence": "支持更多文档格式：Word (.docx)、Markdown、TXT", "category": "documentation", "difficulty": "easy"}
+{"qid": "q43", "question": "多租户改造推荐用哪个方案？", "evidence": "JWT + 中间件（推荐）", "category": "multitenancy", "difficulty": "medium"}
+{"qid": "q44", "question": "Embedding 为什么选 Qwen 而不是 OpenAI？", "evidence": "中文检索精度更高，阿里云国内延迟低", "category": "retrieval", "difficulty": "easy"}
+{"qid": "q45", "question": "联网搜索需要配置哪个环境变量？", "evidence": "TAVILY_API_KEY", "category": "api", "difficulty": "easy"}
+{"qid": "q46", "question": "用户问“总结这份 PDF”这类请求，当前实现是怎么处理的？", "evidence": "总结一下这份 PDF", "category": "rag", "difficulty": "hard"}
