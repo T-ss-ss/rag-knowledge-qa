@@ -64,9 +64,53 @@ async def api_docs():
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>API 文档 · AI 知识库问答系统</title>
-    <style>body { margin: 0; }</style>
+    <style>
+        body { margin: 0; }
+        /* 固定悬浮的“返回对话”入口。不占据文档流，避免与 Scalar 的布局冲突；
+           即使 Scalar 依赖的 CDN 不可用（页面空白），这个按钮依然可见可用。 */
+        #back-to-chat {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 2147483000;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 18px;
+            background: #1a73e8;
+            color: #fff;
+            border-radius: 999px;
+            font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1;
+            text-decoration: none;
+            box-shadow: 0 4px 14px rgba(26, 115, 232, 0.36);
+            transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+        }
+        #back-to-chat:hover {
+            background: #1557b0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(26, 115, 232, 0.44);
+        }
+        #back-to-chat:active { transform: translateY(0); }
+        #back-to-chat svg { width: 16px; height: 16px; flex-shrink: 0; }
+        /* 窄屏下缩成纯图标按钮，避免遮挡正文 */
+        @media (max-width: 640px) {
+            #back-to-chat { right: 16px; bottom: 16px; padding: 12px; }
+            #back-to-chat .label { display: none; }
+        }
+    </style>
 </head>
 <body>
+    <a id="back-to-chat" href="/chat" title="返回对话界面">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M19 12H5" />
+            <path d="M12 19l-7-7 7-7" />
+        </svg>
+        <span class="label">返回对话</span>
+    </a>
     <script id="api-reference" data-url="/openapi.json"></script>
     <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
 </body>
