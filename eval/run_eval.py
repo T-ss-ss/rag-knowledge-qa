@@ -220,9 +220,10 @@ def main(only: list[str] | None = None, validate_only: bool = False,
               f"nDCG@{k}={row[f'ndcg@{k}']:.3f} "
               f"{row['latency_ms']:.0f}ms")
 
-    # 按难度分层（只对 A / C / E 做，避免输出过长）
+    # 按难度分层：覆盖本次实际跑过的全部档位。
+    # （曾硬编码为 A/C/E，导致 D/F 没有分层数据，无法比较"混合链路"上精排的收益分布）
     strata: dict[str, dict] = {}
-    for key in ("A", "C", "E"):
+    for key in CONFIGS:
         if key not in details:
             continue
         by_diff: dict[str, list] = collections.defaultdict(list)
